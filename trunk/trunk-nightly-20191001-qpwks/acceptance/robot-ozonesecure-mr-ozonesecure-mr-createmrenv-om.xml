@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot rpa="false" generated="20191001 05:51:20.691" generator="Robot 3.1.2 (Python 2.7.5 on linux2)">
+<suite source="/opt/hadoop/smoketest/createmrenv.robot" id="s1" name="ozonesecure-mr-createmrenv">
+<test id="s1-t1" name="Create test volume, bucket and key">
+<kw name="Execute And Ignore Error" library="commonlib">
+<arguments>
+<arg>ozone sh bucket info /${volume}/${bucket}</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:20.750" level="INFO">Running command 'ozone sh bucket info /vol1/bucket1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:23.949" level="INFO">${rc} = 255</msg>
+<msg timestamp="20191001 05:51:23.949" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:23.949" starttime="20191001 05:51:20.748"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:23.951" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+VOLUME_NOT_FOUND Volume vol1 is not found</msg>
+<status status="PASS" endtime="20191001 05:51:23.952" starttime="20191001 05:51:23.950"></status>
+</kw>
+<msg timestamp="20191001 05:51:23.952" level="INFO">${result} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:23.952" starttime="20191001 05:51:20.747"></status>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<arguments>
+<arg>"VOLUME_NOT_FOUND" in """${result}"""</arg>
+<arg>Create volume</arg>
+</arguments>
+<kw name="Create volume">
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh volume create /${volume} --user hadoop --quota 100TB</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:23.958" level="INFO">Running command 'ozone sh volume create /vol1 --user hadoop --quota 100TB 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:26.767" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191001 05:51:26.767" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:26.767" starttime="20191001 05:51:23.956"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:26.769" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191001 05:51:26.770" starttime="20191001 05:51:26.768"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191001 05:51:26.771" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191001 05:51:26.771" starttime="20191001 05:51:26.770"></status>
+</kw>
+<msg timestamp="20191001 05:51:26.772" level="INFO">${result} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:26.772" starttime="20191001 05:51:23.955"></status>
+</kw>
+<kw name="Should Not Contain" library="BuiltIn">
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>Failed</arg>
+</arguments>
+<status status="PASS" endtime="20191001 05:51:26.773" starttime="20191001 05:51:26.772"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:26.773" starttime="20191001 05:51:23.954"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:26.773" starttime="20191001 05:51:23.953"></status>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<arguments>
+<arg>"VOLUME_NOT_FOUND" in """${result}"""</arg>
+<arg>Create bucket</arg>
+</arguments>
+<kw name="Create bucket">
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket create /${volume}/${bucket}</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:26.782" level="INFO">Running command 'ozone sh bucket create /vol1/bucket1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:29.420" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191001 05:51:29.420" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:29.421" starttime="20191001 05:51:26.777"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:29.422" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191001 05:51:29.422" starttime="20191001 05:51:29.421"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191001 05:51:29.423" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191001 05:51:29.423" starttime="20191001 05:51:29.422"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:29.423" starttime="20191001 05:51:26.776"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:29.424" starttime="20191001 05:51:26.775"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:29.424" starttime="20191001 05:51:26.774"></status>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<arguments>
+<arg>"BUCKET_NOT_FOUND" in """${result}"""</arg>
+<arg>Create bucket</arg>
+</arguments>
+<status status="PASS" endtime="20191001 05:51:29.424" starttime="20191001 05:51:29.424"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket info /${volume}/${bucket}</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:29.427" level="INFO">Running command 'ozone sh bucket info /vol1/bucket1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:32.139" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191001 05:51:32.139" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:32.139" starttime="20191001 05:51:29.425"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:32.141" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+{
+  "metadata" : { },
+  "volumeName" : "vol1",
+  "name" : "bucket1",
+  "storageType" : "DISK",
+  "versioning" : false,
+  "creationTime" : 1569909089350,
+  "encryptionKeyName" : null
+}</msg>
+<status status="PASS" endtime="20191001 05:51:32.141" starttime="20191001 05:51:32.140"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191001 05:51:32.142" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191001 05:51:32.142" starttime="20191001 05:51:32.141"></status>
+</kw>
+<msg timestamp="20191001 05:51:32.142" level="INFO">${result} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:32.142" starttime="20191001 05:51:29.425"></status>
+</kw>
+<kw name="Should Not Contain" library="BuiltIn">
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>NOT_FOUND</arg>
+</arguments>
+<status status="PASS" endtime="20191001 05:51:32.143" starttime="20191001 05:51:32.143"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key put /vol1/bucket1/key1 LICENSE.txt</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:32.146" level="INFO">Running command 'ozone sh key put /vol1/bucket1/key1 LICENSE.txt 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:37.161" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191001 05:51:37.161" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:37.161" starttime="20191001 05:51:32.144"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:37.163" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191001 05:51:37.163" starttime="20191001 05:51:37.162"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191001 05:51:37.164" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191001 05:51:37.164" starttime="20191001 05:51:37.164"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:37.165" starttime="20191001 05:51:32.143"></status>
+</kw>
+<timeout value="2 minutes"></timeout>
+<status status="PASS" endtime="20191001 05:51:37.165" critical="yes" starttime="20191001 05:51:20.746"></status>
+</test>
+<test id="s1-t2" name="Create user dir for hadoop">
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone fs -mkdir /user</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:37.170" level="INFO">Running command 'ozone fs -mkdir /user 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:40.081" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191001 05:51:40.081" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:40.081" starttime="20191001 05:51:37.168"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:40.083" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191001 05:51:40.083" starttime="20191001 05:51:40.082"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191001 05:51:40.085" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191001 05:51:40.085" starttime="20191001 05:51:40.084"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:40.085" starttime="20191001 05:51:37.167"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone fs -mkdir /user/hadoop</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191001 05:51:40.089" level="INFO">Running command 'ozone fs -mkdir /user/hadoop 2&gt;&amp;1'.</msg>
+<msg timestamp="20191001 05:51:43.083" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191001 05:51:43.083" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-...</msg>
+<status status="PASS" endtime="20191001 05:51:43.083" starttime="20191001 05:51:40.087"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191001 05:51:43.085" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191001 05:51:43.085" starttime="20191001 05:51:43.084"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191001 05:51:43.087" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191001 05:51:43.087" starttime="20191001 05:51:43.086"></status>
+</kw>
+<status status="PASS" endtime="20191001 05:51:43.087" starttime="20191001 05:51:40.086"></status>
+</kw>
+<timeout value="2 minutes"></timeout>
+<status status="PASS" endtime="20191001 05:51:43.088" critical="yes" starttime="20191001 05:51:37.166"></status>
+</test>
+<doc>Create directories required for MR test</doc>
+<status status="PASS" endtime="20191001 05:51:43.089" starttime="20191001 05:51:20.692"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="0" pass="2">Critical Tests</stat>
+<stat fail="0" pass="2">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat fail="0" id="s1" name="ozonesecure-mr-createmrenv" pass="2">ozonesecure-mr-createmrenv</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
