@@ -1,0 +1,639 @@
+rm: cannot remove '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/result/*': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure-mr
+Removing network ozonesecure-mr_default
+Network ozonesecure-mr_default not found.
+Creating network "ozonesecure-mr_default" with the default driver
+Pulling scm (apache/ozone-runner:20190717-1)...
+20190717-1: Pulling from apache/ozone-runner
+Digest: sha256:00bb9519e6d236c50761dcc9c668ce7f04a74f160b916bf3baeaa26232389a69
+Status: Downloaded newer image for apache/ozone-runner:20190717-1
+Pulling nm (apache/hadoop:3)...
+3: Pulling from apache/hadoop
+Digest: sha256:5cba355fd83de1bcce907abaa7f8ac3cfbc2ab74a09785ecdc892392883344f6
+Status: Downloaded newer image for apache/hadoop:3
+Building kdc
+Step 1/16 : FROM openjdk:8u191-jdk-alpine3.9
+8u191-jdk-alpine3.9: Pulling from library/openjdk
+Digest: sha256:d2e2716147d1f7fe73b1a9f72a9cff7a7aa92d32eb8de4fffbfddc596e004984
+Status: Downloaded newer image for openjdk:8u191-jdk-alpine3.9
+ ---> e9ea51023687
+Step 2/16 : RUN apk add --no-cache bash ca-certificates openssl krb5-server krb5 && rm -rf /var/cache/apk/* && update-ca-certificates
+ ---> Running in 8a2fc7b6876e
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/x86_64/APKINDEX.tar.gz
+(1/15) Installing ncurses-terminfo-base (6.1_p20190105-r0)
+(2/15) Installing ncurses-terminfo (6.1_p20190105-r0)
+(3/15) Installing ncurses-libs (6.1_p20190105-r0)
+(4/15) Installing readline (7.0.003-r1)
+(5/15) Installing bash (4.4.19-r1)
+Executing bash-4.4.19-r1.post-install
+(6/15) Installing e2fsprogs-libs (1.44.5-r0)
+(7/15) Installing krb5 (1.15.5-r0)
+(8/15) Installing libev (4.25-r0)
+(9/15) Installing libverto-libev (0.3.0-r1)
+(10/15) Installing db (5.3.28-r1)
+(11/15) Installing libsasl (2.1.27-r1)
+(12/15) Installing libldap (2.4.48-r0)
+(13/15) Installing krb5-server-ldap (1.15.5-r0)
+(14/15) Installing krb5-server (1.15.5-r0)
+(15/15) Installing openssl (1.1.1b-r1)
+Executing busybox-1.29.3-r10.trigger
+OK: 117 MiB in 69 packages
+[91mWARNING: ca-certificates.crt does not contain exactly one certificate or CRL: skipping
+[0m ---> 866e026119ee
+Step 3/16 : RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
+ ---> Running in cb7f71574738
+[91mConnecting to github.com (192.30.255.113:443)
+[0m[91mConnecting to github-production-release-asset-2e65be.s3.amazonaws.com (52.216.146.19:443)
+[0m[91mdumb-init            100% |********************************| 46400  0:00:00 ETA
+
+[0m ---> 23626085b46f
+Step 4/16 : RUN chmod +x /usr/local/bin/dumb-init
+ ---> Running in 3f8301da6a93
+ ---> eadb6ee89fe6
+Step 5/16 : RUN wget -O /root/issuer https://github.com/ajayydv/docker/raw/kdc/issuer
+ ---> Running in 6e81e7c983b5
+[91mConnecting to github.com (192.30.255.113:443)
+[0m[91mConnecting to raw.githubusercontent.com (151.101.192.133:443)
+[0m[91missuer               100% |********************************| 6586k  0:00:00 ETA
+
+[0m ---> 0ce32a92093c
+Step 6/16 : RUN chmod +x /root/issuer
+ ---> Running in 4e07c81faa75
+ ---> 5dd2edb92401
+Step 7/16 : WORKDIR /opt
+ ---> b2c8473b7a0f
+Step 8/16 : COPY krb5.conf /etc/
+ ---> ed05be49407d
+Step 9/16 : COPY kadm5.acl /var/lib/krb5kdc/kadm5.acl
+ ---> 68851b4cb65c
+Step 10/16 : RUN kdb5_util create -s -P Welcome1
+ ---> Running in 4f5f09ee35c9
+Loading random data
+Initializing database '/var/lib/krb5kdc/principal' for realm 'EXAMPLE.COM',
+master key name 'K/M@EXAMPLE.COM'
+ ---> f015f610fcca
+Step 11/16 : RUN kadmin.local -q "addprinc -randkey admin/admin@EXAMPLE.COM"
+ ---> Running in 0926ae1152c2
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+[91mWARNING: no policy specified for admin/admin@EXAMPLE.COM; defaulting to no policy
+[0mPrincipal "admin/admin@EXAMPLE.COM" created.
+ ---> 293c4d658aaa
+Step 12/16 : RUN kadmin.local -q "ktadd -k /tmp/admin.keytab admin/admin@EXAMPLE.COM"
+ ---> Running in a24dace970a9
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+Entry for principal admin/admin@EXAMPLE.COM with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:/tmp/admin.keytab.
+Entry for principal admin/admin@EXAMPLE.COM with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:/tmp/admin.keytab.
+ ---> 4487c3d4315a
+Step 13/16 : COPY launcher.sh .
+ ---> 7576be0d74b6
+Step 14/16 : RUN chmod +x /opt/launcher.sh
+ ---> Running in 77ce18aeb2da
+ ---> b610ee03a27c
+Step 15/16 : RUN mkdir -p /data
+ ---> Running in f492b4dc13f8
+ ---> 3a1c4eb89e73
+Step 16/16 : ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/opt/launcher.sh"]
+ ---> Running in 8ea73ff3ac70
+ ---> 36b7f7b5f0d8
+Removing intermediate container 8a2fc7b6876e
+Removing intermediate container 3f8301da6a93
+Removing intermediate container 4e07c81faa75
+Removing intermediate container 0926ae1152c2
+Removing intermediate container a24dace970a9
+Removing intermediate container cb7f71574738
+Removing intermediate container 6e81e7c983b5
+Removing intermediate container 21707a56ab33
+Removing intermediate container 4f5f09ee35c9
+Removing intermediate container 77ce18aeb2da
+Removing intermediate container f492b4dc13f8
+Removing intermediate container 8ea73ff3ac70
+[Warning] One or more build-args [buildno] were not consumed
+Successfully built 36b7f7b5f0d8
+Successfully tagged ozonesecure-mr_kdc:latest
+Image for service kdc was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Pulling spark (ahadoop/spark-2.4:hadoop-3.2)...
+hadoop-3.2: Pulling from ahadoop/spark-2.4
+Digest: sha256:0acf88d80ed5f072a03ff0b1d2b3ba0c6b046015f1a0db66cdf752da3ea0240a
+Status: Downloaded newer image for ahadoop/spark-2.4:hadoop-3.2
+Creating ozonesecure-mr_datanode_1 ... 
+Creating ozonesecure-mr_datanode_2 ... 
+Creating ozonesecure-mr_datanode_3 ... 
+Creating ozonesecure-mr_om_1       ... 
+Creating ozonesecure-mr_s3g_1      ... 
+Creating ozonesecure-mr_kdc_1      ... 
+Creating ozonesecure-mr_nm_1       ... 
+Creating ozonesecure-mr_kms_1      ... 
+Creating ozonesecure-mr_rm_1       ... 
+Creating ozonesecure-mr_spark_1    ... 
+Creating ozonesecure-mr_scm_1      ... 
+Creating ozonesecure-mr_jhs_1      ... 
+[7A[2KCreating ozonesecure-mr_kdc_1      ... [32mdone[0m[7B[9A[2KCreating ozonesecure-mr_om_1       ... [32mdone[0m[9B[12A[2KCreating ozonesecure-mr_datanode_1 ... [32mdone[0m[12B[10A[2KCreating ozonesecure-mr_datanode_3 ... [32mdone[0m[10B[1A[2KCreating ozonesecure-mr_jhs_1      ... [32mdone[0m[1B[6A[2KCreating ozonesecure-mr_nm_1       ... [32mdone[0m[6B[2A[2KCreating ozonesecure-mr_scm_1      ... [32mdone[0m[2B[8A[2KCreating ozonesecure-mr_s3g_1      ... [32mdone[0m[8B[5A[2KCreating ozonesecure-mr_kms_1      ... [32mdone[0m[5B[4A[2KCreating ozonesecure-mr_rm_1       ... [32mdone[0m[4BConnection pool is full, discarding connection: 0.0.0.0
+[3A[2KCreating ozonesecure-mr_spark_1    ... [32mdone[0m[3BConnection pool is full, discarding connection: 0.0.0.0
+[11A[2KCreating ozonesecure-mr_datanode_2 ... [32mdone[0m[11Bkinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+0 datanode is up and healthy (until now)
+0 datanode is up and healthy (until now)
+0 datanode is up and healthy (until now)
+3 datanodes are up and registered to the scm
+==============================================================================
+ozonesecure-mr-kinit :: Kinit test user                                       
+==============================================================================
+Kinit                                                                 | PASS |
+------------------------------------------------------------------------------
+ozonesecure-mr-kinit :: Kinit test user                               | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+Output:  /tmp/smoketest/ozonesecure-mr/result/robot-ozonesecure-mr-ozonesecure-mr-kinit-om.xml
+==============================================================================
+ozonesecure-mr-createmrenv :: Create directories required for MR test         
+==============================================================================
+Create test volume, bucket and key                                    No container found for rm_1
+No container found for rm_1
+Error: No such container:path: ozonesecure-mr_rm_1:/tmp/smoketest/ozonesecure-mr/result/robot-ozonesecure-mr-ozonesecure-mr-kinit-hadoop-rm.xml
+No container found for rm_1
+No container found for rm_1
+Error: No such container:path: ozonesecure-mr_rm_1:/tmp/smoketest/ozonesecure-mr/result/robot-ozonesecure-mr-ozonesecure-mr-mapreduce-rm.xml
+Connection pool is full, discarding connection: 0.0.0.0
+Connection pool is full, discarding connection: 0.0.0.0
+Connection pool is full, discarding connection: 0.0.0.0
+Connection pool is full, discarding connection: 0.0.0.0
+Connection pool is full, discarding connection: 0.0.0.0
+Connection pool is full, discarding connection: 0.0.0.0
+Stopping ozonesecure-mr_spark_1 ... 
+Stopping ozonesecure-mr_om_1    ... 
+Stopping ozonesecure-mr_kdc_1   ... 
+[1A[2KStopping ozonesecure-mr_kdc_1   ... [32mdone[0m[1B[3A[2KStopping ozonesecure-mr_spark_1 ... [32mdone[0m[3B
+ERROR: for ozonesecure-mr_om_1  HTTPConnectionPool(host='0.0.0.0', port=2375): Read timed out. (read timeout=70)
+An HTTP request took too long to complete. Retry with --verbose to obtain debug information.
+If you encounter this issue regularly because of slow network conditions, consider setting COMPOSE_HTTP_TIMEOUT to a higher value (current value: 60).
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure-mr is FAILED!!!!
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop27
+Removing network hadoop27_default
+Network hadoop27_default not found.
+Creating network "hadoop27_default" with the default driver
+Pulling nm (flokkr/hadoop:2.7.7)...
+2.7.7: Pulling from flokkr/hadoop
+Digest: sha256:594a1cc971f4e91218132f2027617859d4624a55bda01bc43ec07545022ac6c9
+Status: Downloaded newer image for flokkr/hadoop:2.7.7
+Creating hadoop27_datanode_1 ... 
+Creating hadoop27_datanode_2 ... 
+Creating hadoop27_datanode_3 ... 
+Creating hadoop27_nm_1       ... 
+Creating hadoop27_s3g_1      ... 
+Creating hadoop27_rm_1       ... 
+Creating hadoop27_scm_1      ... 
+Creating hadoop27_om_1       ... 
+[7A[2KCreating hadoop27_datanode_2 ... [32mdone[0m[7B[8A[2KCreating hadoop27_datanode_1 ... [32mdone[0m[8B[3A[2KCreating hadoop27_rm_1       ... [32mdone[0m[3B[1A[2KCreating hadoop27_om_1       ... [31merror[0m[1B
+ERROR: for hadoop27_om_1  Cannot start service om: driver failed programming external connectivity on endpoint hadoop27_om_1 (779332bc4e34909f2b737fb99690926c86d3ff211a9deac981ea4fad0a0e0a32): Bind for 0.0.0.0:9874 failed: port is already allocated
+[5A[2KCreating hadoop27_nm_1       ... [32mdone[0m[5B[6A[2KCreating hadoop27_datanode_3 ... [32mdone[0m[6B[4A[2KCreating hadoop27_s3g_1      ... [32mdone[0m[4B[2A[2KCreating hadoop27_scm_1      ... [32mdone[0m[2B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint hadoop27_om_1 (779332bc4e34909f2b737fb99690926c86d3ff211a9deac981ea4fad0a0e0a32): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping hadoop27_scm_1      ... 
+Stopping hadoop27_nm_1       ... 
+Stopping hadoop27_datanode_3 ... 
+Stopping hadoop27_s3g_1      ... 
+Stopping hadoop27_rm_1       ... 
+Stopping hadoop27_datanode_1 ... 
+Stopping hadoop27_datanode_2 ... 
+[3A[2KStopping hadoop27_rm_1       ... [32mdone[0m[3B[4A[2KStopping hadoop27_s3g_1      ... [32mdone[0m[4B[6A[2KStopping hadoop27_nm_1       ... [32mdone[0m[6B[7A[2KStopping hadoop27_scm_1      ... [32mdone[0m[7B[2A[2KStopping hadoop27_datanode_1 ... [32mdone[0m[2B[5A[2KStopping hadoop27_datanode_3 ... [32mdone[0m[5B[1A[2KStopping hadoop27_datanode_2 ... [32mdone[0m[1BRemoving hadoop27_om_1       ... 
+Removing hadoop27_scm_1      ... 
+Removing hadoop27_nm_1       ... 
+Removing hadoop27_datanode_3 ... 
+Removing hadoop27_s3g_1      ... 
+Removing hadoop27_rm_1       ... 
+Removing hadoop27_datanode_1 ... 
+Removing hadoop27_datanode_2 ... 
+[6A[2KRemoving hadoop27_nm_1       ... [32mdone[0m[6B[3A[2KRemoving hadoop27_rm_1       ... [32mdone[0m[3B[1A[2KRemoving hadoop27_datanode_2 ... [32mdone[0m[1B[7A[2KRemoving hadoop27_scm_1      ... [32mdone[0m[7B[8A[2KRemoving hadoop27_om_1       ... [32mdone[0m[8B[2A[2KRemoving hadoop27_datanode_1 ... [32mdone[0m[2B[5A[2KRemoving hadoop27_datanode_3 ... [32mdone[0m[5B[4A[2KRemoving hadoop27_s3g_1      ... [32mdone[0m[4BRemoving network hadoop27_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop27 is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop27/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop32
+Removing network hadoop32_default
+Network hadoop32_default not found.
+Creating network "hadoop32_default" with the default driver
+Creating hadoop32_om_1 ... 
+Creating hadoop32_s3g_1 ... 
+Creating hadoop32_nm_1  ... 
+Creating hadoop32_datanode_1 ... 
+Creating hadoop32_datanode_2 ... 
+Creating hadoop32_datanode_3 ... 
+Creating hadoop32_scm_1      ... 
+Creating hadoop32_rm_1       ... 
+[2A[2KCreating hadoop32_scm_1      ... [32mdone[0m[2B[8A[2KCreating hadoop32_om_1       ... [31merror[0m[8B
+ERROR: for hadoop32_om_1  Cannot start service om: driver failed programming external connectivity on endpoint hadoop32_om_1 (8313a1c707cd5bd702b315d7db3e9f69536ab9997cf93a695e919ccca99ed5e9): Bind for 0.0.0.0:9874 failed: port is already allocated
+[7A[2KCreating hadoop32_s3g_1      ... [32mdone[0m[7B[4A[2KCreating hadoop32_datanode_2 ... [32mdone[0m[4B[5A[2KCreating hadoop32_datanode_1 ... [32mdone[0m[5B[6A[2KCreating hadoop32_nm_1       ... [32mdone[0m[6B[3A[2KCreating hadoop32_datanode_3 ... [32mdone[0m[3B[1A[2KCreating hadoop32_rm_1       ... [32mdone[0m[1B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint hadoop32_om_1 (8313a1c707cd5bd702b315d7db3e9f69536ab9997cf93a695e919ccca99ed5e9): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping hadoop32_rm_1       ... 
+Stopping hadoop32_nm_1       ... 
+Stopping hadoop32_datanode_2 ... 
+Stopping hadoop32_datanode_1 ... 
+Stopping hadoop32_s3g_1      ... 
+Stopping hadoop32_datanode_3 ... 
+Stopping hadoop32_scm_1      ... 
+[6A[2KStopping hadoop32_nm_1       ... [32mdone[0m[6B[1A[2KStopping hadoop32_scm_1      ... [32mdone[0m[1B[7A[2KStopping hadoop32_rm_1       ... [32mdone[0m[7B[5A[2KStopping hadoop32_datanode_2 ... [32mdone[0m[5B[2A[2KStopping hadoop32_datanode_3 ... [32mdone[0m[2B[3A[2KStopping hadoop32_s3g_1      ... [32mdone[0m[3B[4A[2KStopping hadoop32_datanode_1 ... [32mdone[0m[4BRemoving hadoop32_rm_1       ... 
+Removing hadoop32_nm_1       ... 
+Removing hadoop32_datanode_2 ... 
+Removing hadoop32_datanode_1 ... 
+Removing hadoop32_om_1       ... 
+Removing hadoop32_s3g_1      ... 
+Removing hadoop32_datanode_3 ... 
+Removing hadoop32_scm_1      ... 
+[1A[2KRemoving hadoop32_scm_1      ... [32mdone[0m[1B[6A[2KRemoving hadoop32_datanode_2 ... [32mdone[0m[6B[5A[2KRemoving hadoop32_datanode_1 ... [32mdone[0m[5B[2A[2KRemoving hadoop32_datanode_3 ... [32mdone[0m[2B[8A[2KRemoving hadoop32_rm_1       ... [32mdone[0m[8B[4A[2KRemoving hadoop32_om_1       ... [32mdone[0m[4B[7A[2KRemoving hadoop32_nm_1       ... [32mdone[0m[7B[3A[2KRemoving hadoop32_s3g_1      ... [32mdone[0m[3BRemoving network hadoop32_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop32 is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop32/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop31
+Removing network hadoop31_default
+Network hadoop31_default not found.
+Creating network "hadoop31_default" with the default driver
+Pulling nm (flokkr/hadoop:3.1.2)...
+3.1.2: Pulling from flokkr/hadoop
+Digest: sha256:aaed24f2f15ef520340c98c99c96c62056e018fdfe4591b8dfdfa8fd50636dc1
+Status: Downloaded newer image for flokkr/hadoop:3.1.2
+Creating hadoop31_datanode_1 ... 
+Creating hadoop31_datanode_2 ... 
+Creating hadoop31_rm_1       ... 
+Creating hadoop31_datanode_3 ... 
+Creating hadoop31_nm_1       ... 
+Creating hadoop31_scm_1      ... 
+Creating hadoop31_om_1       ... 
+Creating hadoop31_s3g_1      ... 
+[8A[2KCreating hadoop31_datanode_1 ... [32mdone[0m[8B[7A[2KCreating hadoop31_datanode_2 ... [32mdone[0m[7B[4A[2KCreating hadoop31_nm_1       ... [32mdone[0m[4B[5A[2KCreating hadoop31_rm_1       ... [32mdone[0m[5B[2A[2KCreating hadoop31_om_1       ... [31merror[0m[2B
+ERROR: for hadoop31_om_1  Cannot start service om: driver failed programming external connectivity on endpoint hadoop31_om_1 (18f115b752591d15db1d545aace9b0774a72c391e2f75beece220bf5fb0e8d18): Bind for 0.0.0.0:9874 failed: port is already allocated
+[1A[2KCreating hadoop31_s3g_1      ... [32mdone[0m[1B[3A[2KCreating hadoop31_scm_1      ... [32mdone[0m[3B[6A[2KCreating hadoop31_datanode_3 ... [32mdone[0m[6B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint hadoop31_om_1 (18f115b752591d15db1d545aace9b0774a72c391e2f75beece220bf5fb0e8d18): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping hadoop31_scm_1      ... 
+Stopping hadoop31_s3g_1      ... 
+Stopping hadoop31_datanode_3 ... 
+Stopping hadoop31_rm_1       ... 
+Stopping hadoop31_nm_1       ... 
+Stopping hadoop31_datanode_2 ... 
+Stopping hadoop31_datanode_1 ... 
+[5A[2KStopping hadoop31_datanode_3 ... [32mdone[0m[5B[4A[2KStopping hadoop31_rm_1       ... [32mdone[0m[4B[7A[2KStopping hadoop31_scm_1      ... [32mdone[0m[7B[3A[2KStopping hadoop31_nm_1       ... [32mdone[0m[3B[6A[2KStopping hadoop31_s3g_1      ... [32mdone[0m[6B[2A[2KStopping hadoop31_datanode_2 ... [32mdone[0m[2B[1A[2KStopping hadoop31_datanode_1 ... [32mdone[0m[1BRemoving hadoop31_scm_1      ... 
+Removing hadoop31_om_1       ... 
+Removing hadoop31_s3g_1      ... 
+Removing hadoop31_datanode_3 ... 
+Removing hadoop31_rm_1       ... 
+Removing hadoop31_nm_1       ... 
+Removing hadoop31_datanode_2 ... 
+Removing hadoop31_datanode_1 ... 
+[5A[2KRemoving hadoop31_datanode_3 ... [32mdone[0m[5B[7A[2KRemoving hadoop31_om_1       ... [32mdone[0m[7B[4A[2KRemoving hadoop31_rm_1       ... [32mdone[0m[4B[2A[2KRemoving hadoop31_datanode_2 ... [32mdone[0m[2B[8A[2KRemoving hadoop31_scm_1      ... [32mdone[0m[8B[6A[2KRemoving hadoop31_s3g_1      ... [32mdone[0m[6B[1A[2KRemoving hadoop31_datanode_1 ... [32mdone[0m[1B[3A[2KRemoving hadoop31_nm_1       ... [32mdone[0m[3BRemoving network hadoop31_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop31 is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-mr/hadoop31/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3
+Removing network ozones3_default
+Network ozones3_default not found.
+Creating network "ozones3_default" with the default driver
+Creating ozones3_scm_1 ... 
+Creating ozones3_om_1  ... 
+Creating ozones3_datanode_1 ... 
+Creating ozones3_datanode_2 ... 
+Creating ozones3_datanode_3 ... 
+Creating ozones3_s3g_1      ... 
+[6A[2KCreating ozones3_scm_1      ... [32mdone[0m[6B[1A[2KCreating ozones3_s3g_1      ... [32mdone[0m[1B[5A[2KCreating ozones3_om_1       ... [31merror[0m[5B
+ERROR: for ozones3_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozones3_om_1 (90e4d67b5052ecec17048c9a93961ece43e4dce93abad0550d7b11c3588a6ea4): Bind for 0.0.0.0:9874 failed: port is already allocated
+[4A[2KCreating ozones3_datanode_1 ... [32mdone[0m[4B[3A[2KCreating ozones3_datanode_2 ... [32mdone[0m[3B[2A[2KCreating ozones3_datanode_3 ... [32mdone[0m[2B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozones3_om_1 (90e4d67b5052ecec17048c9a93961ece43e4dce93abad0550d7b11c3588a6ea4): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozones3_datanode_3 ... 
+Stopping ozones3_datanode_2 ... 
+Stopping ozones3_s3g_1      ... 
+Stopping ozones3_datanode_1 ... 
+Stopping ozones3_scm_1      ... 
+[5A[2KStopping ozones3_datanode_3 ... [32mdone[0m[5B[1A[2KStopping ozones3_scm_1      ... [32mdone[0m[1B[2A[2KStopping ozones3_datanode_1 ... [32mdone[0m[2B[4A[2KStopping ozones3_datanode_2 ... [32mdone[0m[4B[3A[2KStopping ozones3_s3g_1      ... [32mdone[0m[3BRemoving ozones3_datanode_3 ... 
+Removing ozones3_om_1       ... 
+Removing ozones3_datanode_2 ... 
+Removing ozones3_s3g_1      ... 
+Removing ozones3_datanode_1 ... 
+Removing ozones3_scm_1      ... 
+[1A[2KRemoving ozones3_scm_1      ... [32mdone[0m[1B[4A[2KRemoving ozones3_datanode_2 ... [32mdone[0m[4B[3A[2KRemoving ozones3_s3g_1      ... [32mdone[0m[3B[5A[2KRemoving ozones3_om_1       ... [32mdone[0m[5B[6A[2KRemoving ozones3_datanode_3 ... [32mdone[0m[6B[2A[2KRemoving ozones3_datanode_1 ... [32mdone[0m[2BRemoving network ozones3_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3 is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone
+Removing network ozone_default
+Network ozone_default not found.
+Creating network "ozone_default" with the default driver
+Creating ozone_datanode_1 ... 
+Creating ozone_datanode_2 ... 
+Creating ozone_datanode_3 ... 
+Creating ozone_scm_1      ... 
+Creating ozone_om_1       ... 
+[1A[2KCreating ozone_om_1       ... [31merror[0m[1B
+ERROR: for ozone_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozone_om_1 (1aff83e7154c352211788e1021830f1866730fe54380b064dfa6e5a44a04bb70): Bind for 0.0.0.0:9874 failed: port is already allocated
+[4A[2KCreating ozone_datanode_2 ... [32mdone[0m[4B[5A[2KCreating ozone_datanode_1 ... [32mdone[0m[5B[2A[2KCreating ozone_scm_1      ... [32mdone[0m[2B[3A[2KCreating ozone_datanode_3 ... [32mdone[0m[3B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozone_om_1 (1aff83e7154c352211788e1021830f1866730fe54380b064dfa6e5a44a04bb70): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozone_scm_1      ... 
+Stopping ozone_datanode_3 ... 
+Stopping ozone_datanode_1 ... 
+Stopping ozone_datanode_2 ... 
+[4A[2KStopping ozone_scm_1      ... [32mdone[0m[4B[2A[2KStopping ozone_datanode_1 ... [32mdone[0m[2B[1A[2KStopping ozone_datanode_2 ... [32mdone[0m[1B[3A[2KStopping ozone_datanode_3 ... [32mdone[0m[3BRemoving ozone_scm_1      ... 
+Removing ozone_om_1       ... 
+Removing ozone_datanode_3 ... 
+Removing ozone_datanode_1 ... 
+Removing ozone_datanode_2 ... 
+[5A[2KRemoving ozone_scm_1      ... [32mdone[0m[5B[3A[2KRemoving ozone_datanode_3 ... [32mdone[0m[3B[4A[2KRemoving ozone_om_1       ... [32mdone[0m[4B[2A[2KRemoving ozone_datanode_1 ... [32mdone[0m[2B[1A[2KRemoving ozone_datanode_2 ... [32mdone[0m[1BRemoving network ozone_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure
+Removing network ozonesecure_default
+Network ozonesecure_default not found.
+Creating network "ozonesecure_default" with the default driver
+Building kdc
+Step 1/16 : FROM openjdk:8u191-jdk-alpine3.9
+ ---> e9ea51023687
+Step 2/16 : RUN apk add --update bash ca-certificates openssl krb5-server krb5 && rm -rf /var/cache/apk/* && update-ca-certificates
+ ---> Running in ab36e2e0ab99
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/x86_64/APKINDEX.tar.gz
+(1/15) Installing ncurses-terminfo-base (6.1_p20190105-r0)
+(2/15) Installing ncurses-terminfo (6.1_p20190105-r0)
+(3/15) Installing ncurses-libs (6.1_p20190105-r0)
+(4/15) Installing readline (7.0.003-r1)
+(5/15) Installing bash (4.4.19-r1)
+Executing bash-4.4.19-r1.post-install
+(6/15) Installing e2fsprogs-libs (1.44.5-r0)
+(7/15) Installing krb5 (1.15.5-r0)
+(8/15) Installing libev (4.25-r0)
+(9/15) Installing libverto-libev (0.3.0-r1)
+(10/15) Installing db (5.3.28-r1)
+(11/15) Installing libsasl (2.1.27-r1)
+(12/15) Installing libldap (2.4.48-r0)
+(13/15) Installing krb5-server-ldap (1.15.5-r0)
+(14/15) Installing krb5-server (1.15.5-r0)
+(15/15) Installing openssl (1.1.1b-r1)
+Executing busybox-1.29.3-r10.trigger
+OK: 117 MiB in 69 packages
+[91mWARNING: ca-certificates.crt does not contain exactly one certificate or CRL: skipping
+[0m ---> 1708ec4e8bba
+Step 3/16 : RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
+ ---> Running in 893a5d6d3dff
+[91mConnecting to github.com (192.30.255.112:443)
+[0m[91mConnecting to github-production-release-asset-2e65be.s3.amazonaws.com (52.216.94.3:443)
+[0m[91mdumb-init            100% |********************************| 46400  0:00:00 ETA
+
+[0m ---> f4a63c75f79d
+Step 4/16 : RUN chmod +x /usr/local/bin/dumb-init
+ ---> Running in 215d0ef435fa
+ ---> 59387e390d9b
+Step 5/16 : RUN wget -O /root/issuer https://github.com/ajayydv/docker/raw/kdc/issuer
+ ---> Running in 28c1389f0773
+[91mConnecting to github.com (192.30.255.112:443)
+[0m[91mConnecting to raw.githubusercontent.com (151.101.0.133:443)
+[0m[91missuer               100% |********************************| 6586k  0:00:00 ETA
+
+[0m ---> d9504bfe5839
+Step 6/16 : RUN chmod +x /root/issuer
+ ---> Running in 92f9d6ef5b2f
+ ---> b86ffad5ac1d
+Step 7/16 : WORKDIR /opt
+ ---> 88a4ac52644c
+Step 8/16 : ADD krb5.conf /etc/
+ ---> 11555e588925
+Step 9/16 : ADD kadm5.acl /var/lib/krb5kdc/kadm5.acl
+ ---> c4846400c306
+Step 10/16 : RUN kdb5_util create -s -P Welcome1
+ ---> Running in c33619b20b48
+Loading random data
+Initializing database '/var/lib/krb5kdc/principal' for realm 'EXAMPLE.COM',
+master key name 'K/M@EXAMPLE.COM'
+ ---> b846c3f04424
+Step 11/16 : RUN kadmin.local -q "addprinc -randkey admin/admin@EXAMPLE.COM"
+ ---> Running in ecb75905acc1
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+[91mWARNING: no policy specified for admin/admin@EXAMPLE.COM; defaulting to no policy
+[0mPrincipal "admin/admin@EXAMPLE.COM" created.
+ ---> fe5a693e1769
+Step 12/16 : RUN kadmin.local -q "ktadd -k /tmp/admin.keytab admin/admin@EXAMPLE.COM"
+ ---> Running in 6f5dac246250
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+Entry for principal admin/admin@EXAMPLE.COM with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:/tmp/admin.keytab.
+Entry for principal admin/admin@EXAMPLE.COM with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:/tmp/admin.keytab.
+ ---> 4bda5b11e330
+Step 13/16 : ADD launcher.sh .
+ ---> ccc61c5bbfd0
+Step 14/16 : RUN chmod +x /opt/launcher.sh
+ ---> Running in c7e3c4e663eb
+ ---> fb5b060cdf4b
+Step 15/16 : RUN mkdir -p /data
+ ---> Running in 857a6e7e6dab
+ ---> 914d3464f181
+Step 16/16 : ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/opt/launcher.sh"]
+ ---> Running in cf62af262441
+ ---> 45f9b1d0dfc8
+Removing intermediate container 2d206a02f45f
+Removing intermediate container 6f5dac246250
+Removing intermediate container cf62af262441
+Removing intermediate container ab36e2e0ab99
+Removing intermediate container 893a5d6d3dff
+Removing intermediate container 28c1389f0773
+Removing intermediate container 92f9d6ef5b2f
+Removing intermediate container 857a6e7e6dab
+Removing intermediate container 215d0ef435fa
+Removing intermediate container c33619b20b48
+Removing intermediate container ecb75905acc1
+Removing intermediate container c7e3c4e663eb
+[Warning] One or more build-args [buildno] were not consumed
+Successfully built 45f9b1d0dfc8
+Successfully tagged ozonesecure_kdc:latest
+Image for service kdc was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Creating ozonesecure_kdc_1 ... 
+Creating ozonesecure_recon_1 ... 
+Creating ozonesecure_datanode_1 ... 
+Creating ozonesecure_datanode_2 ... 
+Creating ozonesecure_datanode_3 ... 
+Creating ozonesecure_kms_1      ... 
+Creating ozonesecure_scm_1      ... 
+Creating ozonesecure_s3g_1      ... 
+Creating ozonesecure_om_1       ... 
+[9A[2KCreating ozonesecure_kdc_1      ... [32mdone[0m[9B[1A[2KCreating ozonesecure_om_1       ... [31merror[0m[1B
+ERROR: for ozonesecure_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozonesecure_om_1 (aad3cd876764df1731aa73e2f0142112341be8219db7fbbf48136a66c2ccc8d7): Bind for 0.0.0.0:9874 failed: port is already allocated
+[5A[2KCreating ozonesecure_datanode_3 ... [32mdone[0m[5B[4A[2KCreating ozonesecure_kms_1      ... [32mdone[0m[4B[3A[2KCreating ozonesecure_scm_1      ... [32mdone[0m[3B[7A[2KCreating ozonesecure_datanode_1 ... [32mdone[0m[7B[2A[2KCreating ozonesecure_s3g_1      ... [32mdone[0m[2B[8A[2KCreating ozonesecure_recon_1    ... [32mdone[0m[8B[6A[2KCreating ozonesecure_datanode_2 ... [32mdone[0m[6B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozonesecure_om_1 (aad3cd876764df1731aa73e2f0142112341be8219db7fbbf48136a66c2ccc8d7): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozonesecure_s3g_1      ... 
+Stopping ozonesecure_recon_1    ... 
+Stopping ozonesecure_datanode_2 ... 
+Stopping ozonesecure_datanode_1 ... 
+Stopping ozonesecure_scm_1      ... 
+Stopping ozonesecure_datanode_3 ... 
+Stopping ozonesecure_kms_1      ... 
+Stopping ozonesecure_kdc_1      ... 
+[7A[2KStopping ozonesecure_recon_1    ... [32mdone[0m[7B[2A[2KStopping ozonesecure_kms_1      ... [32mdone[0m[2B[3A[2KStopping ozonesecure_datanode_3 ... [32mdone[0m[3B[8A[2KStopping ozonesecure_s3g_1      ... [32mdone[0m[8B[1A[2KStopping ozonesecure_kdc_1      ... [32mdone[0m[1B[6A[2KStopping ozonesecure_datanode_2 ... [32mdone[0m[6B[5A[2KStopping ozonesecure_datanode_1 ... [32mdone[0m[5B[4A[2KStopping ozonesecure_scm_1      ... [32mdone[0m[4BRemoving ozonesecure_s3g_1      ... 
+Removing ozonesecure_recon_1    ... 
+Removing ozonesecure_datanode_2 ... 
+Removing ozonesecure_datanode_1 ... 
+Removing ozonesecure_om_1       ... 
+Removing ozonesecure_scm_1      ... 
+Removing ozonesecure_datanode_3 ... 
+Removing ozonesecure_kms_1      ... 
+Removing ozonesecure_kdc_1      ... 
+[4A[2KRemoving ozonesecure_scm_1      ... [32mdone[0m[4B[2A[2KRemoving ozonesecure_kms_1      ... [32mdone[0m[2B[1A[2KRemoving ozonesecure_kdc_1      ... [32mdone[0m[1B[8A[2KRemoving ozonesecure_recon_1    ... [32mdone[0m[8B[6A[2KRemoving ozonesecure_datanode_1 ... [32mdone[0m[6B[5A[2KRemoving ozonesecure_om_1       ... [32mdone[0m[5B[3A[2KRemoving ozonesecure_datanode_3 ... [32mdone[0m[3B[9A[2KRemoving ozonesecure_s3g_1      ... [32mdone[0m[9B[7A[2KRemoving ozonesecure_datanode_2 ... [32mdone[0m[7BRemoving network ozonesecure_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3-haproxy
+Removing network ozones3-haproxy_default
+Network ozones3-haproxy_default not found.
+Creating network "ozones3-haproxy_default" with the default driver
+Pulling s3g (haproxy:latest)...
+latest: Pulling from library/haproxy
+Digest: sha256:b9cbd6e1f4c1c9cf9fc9927e0f7ce908b4f83aeaaad16362d1c1e42814f9b689
+Status: Downloaded newer image for haproxy:latest
+Creating ozones3-haproxy_s3g2_1 ... 
+Creating ozones3-haproxy_scm_1  ... 
+Creating ozones3-haproxy_om_1   ... 
+Creating ozones3-haproxy_s3g3_1 ... 
+Creating ozones3-haproxy_s3g_1  ... 
+Creating ozones3-haproxy_s3g1_1 ... 
+Creating ozones3-haproxy_datanode_1 ... 
+Creating ozones3-haproxy_datanode_2 ... 
+Creating ozones3-haproxy_datanode_3 ... 
+[9A[2KCreating ozones3-haproxy_s3g2_1     ... [32mdone[0m[9B[8A[2KCreating ozones3-haproxy_scm_1      ... [32mdone[0m[8B[7A[2KCreating ozones3-haproxy_om_1       ... [31merror[0m[7B
+ERROR: for ozones3-haproxy_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozones3-haproxy_om_1 (e7d99df88746cd700853f87b23158e75438eb2bb92b45f75e1e49dd114c5ae45): Bind for 0.0.0.0:9874 failed: port is already allocated
+[4A[2KCreating ozones3-haproxy_s3g1_1     ... [32mdone[0m[4B[3A[2KCreating ozones3-haproxy_datanode_1 ... [32mdone[0m[3B[1A[2KCreating ozones3-haproxy_datanode_3 ... [32mdone[0m[1B[6A[2KCreating ozones3-haproxy_s3g3_1     ... [32mdone[0m[6B[5A[2KCreating ozones3-haproxy_s3g_1      ... [32mdone[0m[5B[2A[2KCreating ozones3-haproxy_datanode_2 ... [32mdone[0m[2B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozones3-haproxy_om_1 (e7d99df88746cd700853f87b23158e75438eb2bb92b45f75e1e49dd114c5ae45): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozones3-haproxy_datanode_3 ... 
+Stopping ozones3-haproxy_datanode_1 ... 
+Stopping ozones3-haproxy_datanode_2 ... 
+Stopping ozones3-haproxy_s3g3_1     ... 
+Stopping ozones3-haproxy_s3g1_1     ... 
+Stopping ozones3-haproxy_scm_1      ... 
+Stopping ozones3-haproxy_s3g_1      ... 
+Stopping ozones3-haproxy_s3g2_1     ... 
+[6A[2KStopping ozones3-haproxy_datanode_2 ... [32mdone[0m[6B[4A[2KStopping ozones3-haproxy_s3g1_1     ... [32mdone[0m[4B[1A[2KStopping ozones3-haproxy_s3g2_1     ... [32mdone[0m[1B[3A[2KStopping ozones3-haproxy_scm_1      ... [32mdone[0m[3B[8A[2KStopping ozones3-haproxy_datanode_3 ... [32mdone[0m[8B[7A[2KStopping ozones3-haproxy_datanode_1 ... [32mdone[0m[7B[5A[2KStopping ozones3-haproxy_s3g3_1     ... [32mdone[0m[5B[2A[2KStopping ozones3-haproxy_s3g_1      ... [32mdone[0m[2BRemoving ozones3-haproxy_datanode_3 ... 
+Removing ozones3-haproxy_datanode_1 ... 
+Removing ozones3-haproxy_datanode_2 ... 
+Removing ozones3-haproxy_om_1       ... 
+Removing ozones3-haproxy_s3g3_1     ... 
+Removing ozones3-haproxy_s3g1_1     ... 
+Removing ozones3-haproxy_scm_1      ... 
+Removing ozones3-haproxy_s3g_1      ... 
+Removing ozones3-haproxy_s3g2_1     ... 
+[3A[2KRemoving ozones3-haproxy_scm_1      ... [32mdone[0m[3B[1A[2KRemoving ozones3-haproxy_s3g2_1     ... [32mdone[0m[1B[2A[2KRemoving ozones3-haproxy_s3g_1      ... [32mdone[0m[2B[6A[2KRemoving ozones3-haproxy_om_1       ... [32mdone[0m[6B[8A[2KRemoving ozones3-haproxy_datanode_1 ... [32mdone[0m[8B[4A[2KRemoving ozones3-haproxy_s3g1_1     ... [32mdone[0m[4B[9A[2KRemoving ozones3-haproxy_datanode_3 ... [32mdone[0m[9B[7A[2KRemoving ozones3-haproxy_datanode_2 ... [32mdone[0m[7B[5A[2KRemoving ozones3-haproxy_s3g3_1     ... [32mdone[0m[5BRemoving network ozones3-haproxy_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3-haproxy is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3-haproxy/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-recon
+Removing network ozone-recon_default
+Network ozone-recon_default not found.
+Creating network "ozone-recon_default" with the default driver
+Creating ozone-recon_datanode_1 ... 
+Creating ozone-recon_om_1       ... 
+Creating ozone-recon_scm_1      ... 
+Creating ozone-recon_datanode_2 ... 
+Creating ozone-recon_datanode_3 ... 
+Creating ozone-recon_recon_1    ... 
+[3A[2KCreating ozone-recon_om_1       ... [31merror[0m[3B
+ERROR: for ozone-recon_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozone-recon_om_1 (379ec36127f9fd7cad05d88dda64e7390125265ffe18a1066e3dae84b56175c6): Bind for 0.0.0.0:9874 failed: port is already allocated
+[5A[2KCreating ozone-recon_datanode_2 ... [32mdone[0m[5B[1A[2KCreating ozone-recon_recon_1    ... [32mdone[0m[1B[4A[2KCreating ozone-recon_datanode_3 ... [32mdone[0m[4B[2A[2KCreating ozone-recon_scm_1      ... [32mdone[0m[2B[6A[2KCreating ozone-recon_datanode_1 ... [32mdone[0m[6B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozone-recon_om_1 (379ec36127f9fd7cad05d88dda64e7390125265ffe18a1066e3dae84b56175c6): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozone-recon_datanode_1 ... 
+Stopping ozone-recon_datanode_3 ... 
+Stopping ozone-recon_recon_1    ... 
+Stopping ozone-recon_datanode_2 ... 
+Stopping ozone-recon_scm_1      ... 
+[1A[2KStopping ozone-recon_scm_1      ... [32mdone[0m[1B[2A[2KStopping ozone-recon_datanode_2 ... [32mdone[0m[2B[4A[2KStopping ozone-recon_datanode_3 ... [32mdone[0m[4B[3A[2KStopping ozone-recon_recon_1    ... [32mdone[0m[3B[5A[2KStopping ozone-recon_datanode_1 ... [32mdone[0m[5BRemoving ozone-recon_datanode_1 ... 
+Removing ozone-recon_datanode_3 ... 
+Removing ozone-recon_recon_1    ... 
+Removing ozone-recon_datanode_2 ... 
+Removing ozone-recon_om_1       ... 
+Removing ozone-recon_scm_1      ... 
+[3A[2KRemoving ozone-recon_datanode_2 ... [32mdone[0m[3B[1A[2KRemoving ozone-recon_scm_1      ... [32mdone[0m[1B[4A[2KRemoving ozone-recon_recon_1    ... [32mdone[0m[4B[2A[2KRemoving ozone-recon_om_1       ... [32mdone[0m[2B[5A[2KRemoving ozone-recon_datanode_3 ... [32mdone[0m[5B[6A[2KRemoving ozone-recon_datanode_1 ... [32mdone[0m[6BRemoving network ozone-recon_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-recon is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-recon/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozoneperf
+Removing network ozoneperf_default
+Network ozoneperf_default not found.
+Creating network "ozoneperf_default" with the default driver
+Pulling jaeger (jaegertracing/all-in-one:latest)...
+latest: Pulling from jaegertracing/all-in-one
+Digest: sha256:96b79bc8b5a95324fae55cfe628ec64baeb9e5f380c2668a3ec56c61471e533c
+Status: Downloaded newer image for jaegertracing/all-in-one:latest
+Pulling grafana (grafana/grafana:)...
+latest: Pulling from grafana/grafana
+Digest: sha256:1a9899e3458920d60e2c5c21131e3db3c317d00cbfcbb5c0f91a69d65c48788d
+Status: Downloaded newer image for grafana/grafana:latest
+Pulling prometheus (prom/prometheus:)...
+latest: Pulling from prom/prometheus
+Digest: sha256:cd93b8711bb92eb9c437d74217311519e0a93bc55779aa664325dc83cd13cb32
+Status: Downloaded newer image for prom/prometheus:latest
+Creating ozoneperf_grafana_1 ... 
+Creating ozoneperf_datanode_1 ... 
+Creating ozoneperf_datanode_2 ... 
+Creating ozoneperf_datanode_3 ... 
+Creating ozoneperf_prometheus_1 ... 
+Creating ozoneperf_s3g_1        ... 
+Creating ozoneperf_om_1         ... 
+Creating ozoneperf_freon_1      ... 
+Creating ozoneperf_jaeger_1     ... 
+Creating ozoneperf_scm_1        ... 
+[10A[2KCreating ozoneperf_grafana_1    ... [32mdone[0m[10B[9A[2KCreating ozoneperf_datanode_1   ... [32mdone[0m[9B[5A[2KCreating ozoneperf_s3g_1        ... [32mdone[0m[5B[3A[2KCreating ozoneperf_freon_1      ... [32mdone[0m[3B[4A[2KCreating ozoneperf_om_1         ... [31merror[0m[4B
+ERROR: for ozoneperf_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozoneperf_om_1 (af077cbec9f8daffa9d02215ff83e32ffb0d32125cd863beef88cff00bbcdc5f): Bind for 0.0.0.0:9874 failed: port is already allocated
+[7A[2KCreating ozoneperf_datanode_3   ... [32mdone[0m[7B[6A[2KCreating ozoneperf_prometheus_1 ... [32mdone[0m[6B[1A[2KCreating ozoneperf_scm_1        ... [32mdone[0m[1B[2A[2KCreating ozoneperf_jaeger_1     ... [32mdone[0m[2B[8A[2KCreating ozoneperf_datanode_2   ... [32mdone[0m[8B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozoneperf_om_1 (af077cbec9f8daffa9d02215ff83e32ffb0d32125cd863beef88cff00bbcdc5f): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozoneperf_datanode_2   ... 
+Stopping ozoneperf_scm_1        ... 
+Stopping ozoneperf_freon_1      ... 
+Stopping ozoneperf_datanode_3   ... 
+Stopping ozoneperf_jaeger_1     ... 
+Stopping ozoneperf_prometheus_1 ... 
+Stopping ozoneperf_s3g_1        ... 
+Stopping ozoneperf_datanode_1   ... 
+Stopping ozoneperf_grafana_1    ... 
+[7A[2KStopping ozoneperf_freon_1      ... [32mdone[0m[7B[4A[2KStopping ozoneperf_prometheus_1 ... [32mdone[0m[4B[5A[2KStopping ozoneperf_jaeger_1     ... [32mdone[0m[5B[8A[2KStopping ozoneperf_scm_1        ... [32mdone[0m[8B[2A[2KStopping ozoneperf_datanode_1   ... [32mdone[0m[2B[9A[2KStopping ozoneperf_datanode_2   ... [32mdone[0m[9B[3A[2KStopping ozoneperf_s3g_1        ... [32mdone[0m[3B[6A[2KStopping ozoneperf_datanode_3   ... [32mdone[0m[6B[1A[2KStopping ozoneperf_grafana_1    ... [32mdone[0m[1BRemoving ozoneperf_datanode_2   ... 
+Removing ozoneperf_scm_1        ... 
+Removing ozoneperf_freon_1      ... 
+Removing ozoneperf_om_1         ... 
+Removing ozoneperf_datanode_3   ... 
+Removing ozoneperf_jaeger_1     ... 
+Removing ozoneperf_prometheus_1 ... 
+Removing ozoneperf_s3g_1        ... 
+Removing ozoneperf_datanode_1   ... 
+Removing ozoneperf_grafana_1    ... 
+[6A[2KRemoving ozoneperf_datanode_3   ... [32mdone[0m[6B[4A[2KRemoving ozoneperf_prometheus_1 ... [32mdone[0m[4B[3A[2KRemoving ozoneperf_s3g_1        ... [32mdone[0m[3B[8A[2KRemoving ozoneperf_freon_1      ... [32mdone[0m[8B[1A[2KRemoving ozoneperf_grafana_1    ... [32mdone[0m[1B[10A[2KRemoving ozoneperf_datanode_2   ... [32mdone[0m[10B[9A[2KRemoving ozoneperf_scm_1        ... [32mdone[0m[9B[5A[2KRemoving ozoneperf_jaeger_1     ... [32mdone[0m[5B[2A[2KRemoving ozoneperf_datanode_1   ... [32mdone[0m[2B[7A[2KRemoving ozoneperf_om_1         ... [32mdone[0m[7BRemoving network ozoneperf_default
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozoneperf is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozoneperf/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-topology
+Removing network ozone-topology_net
+Network ozone-topology_net not found.
+Creating network "ozone-topology_net" with driver "bridge"
+Creating ozone-topology_datanode_4_1 ... 
+Creating ozone-topology_om_1         ... 
+Creating ozone-topology_datanode_1_1 ... 
+Creating ozone-topology_datanode_3_1 ... 
+Creating ozone-topology_scm_1        ... 
+Creating ozone-topology_datanode_2_1 ... 
+[5A[2KCreating ozone-topology_om_1         ... [31merror[0m[5B
+ERROR: for ozone-topology_om_1  Cannot start service om: driver failed programming external connectivity on endpoint ozone-topology_om_1 (7605b79e809b38dbf26c08df6629748671771d3f80ea9542e4eb0e9005716a21): Bind for 0.0.0.0:9874 failed: port is already allocated
+[6A[2KCreating ozone-topology_datanode_4_1 ... [32mdone[0m[6B[4A[2KCreating ozone-topology_datanode_1_1 ... [32mdone[0m[4B[2A[2KCreating ozone-topology_scm_1        ... [32mdone[0m[2B[1A[2KCreating ozone-topology_datanode_2_1 ... [32mdone[0m[1B[3A[2KCreating ozone-topology_datanode_3_1 ... [32mdone[0m[3B
+ERROR: for om  Cannot start service om: driver failed programming external connectivity on endpoint ozone-topology_om_1 (7605b79e809b38dbf26c08df6629748671771d3f80ea9542e4eb0e9005716a21): Bind for 0.0.0.0:9874 failed: port is already allocated
+Encountered errors while bringing up the project.
+Stopping ozone-topology_datanode_3_1 ... 
+Stopping ozone-topology_datanode_2_1 ... 
+Stopping ozone-topology_scm_1        ... 
+Stopping ozone-topology_datanode_1_1 ... 
+Stopping ozone-topology_datanode_4_1 ... 
+[5A[2KStopping ozone-topology_datanode_3_1 ... [32mdone[0m[5B[3A[2KStopping ozone-topology_scm_1        ... [32mdone[0m[3B[1A[2KStopping ozone-topology_datanode_4_1 ... [32mdone[0m[1B[2A[2KStopping ozone-topology_datanode_1_1 ... [32mdone[0m[2B[4A[2KStopping ozone-topology_datanode_2_1 ... [32mdone[0m[4BRemoving ozone-topology_datanode_3_1 ... 
+Removing ozone-topology_datanode_2_1 ... 
+Removing ozone-topology_scm_1        ... 
+Removing ozone-topology_datanode_1_1 ... 
+Removing ozone-topology_datanode_4_1 ... 
+Removing ozone-topology_om_1         ... 
+[3A[2KRemoving ozone-topology_datanode_1_1 ... [32mdone[0m[3B[6A[2KRemoving ozone-topology_datanode_3_1 ... [32mdone[0m[6B[2A[2KRemoving ozone-topology_datanode_4_1 ... [32mdone[0m[2B[1A[2KRemoving ozone-topology_om_1         ... [32mdone[0m[1B[5A[2KRemoving ozone-topology_datanode_2_1 ... [32mdone[0m[5B[4A[2KRemoving ozone-topology_scm_1        ... [32mdone[0m[4BRemoving network ozone-topology_net
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-topology is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone-topology/result/robot-*.xml': No such file or directory
+[ ERROR ] Reading XML source '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/result/robot-ozonesecure-mr-ozonesecure-mr-createmrenv-om.xml' failed: ParseError: no element found: line 151, column 74
+
+Try --help for usage information.
+cp: cannot stat '/tmp/log/pr/pr-trunk-878pl/acceptance/log.html': No such file or directory
