@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot rpa="false" generated="20191004 20:15:33.508" generator="Robot 3.1.2 (Python 2.7.15 on linux2)">
+<suite source="/opt/ozone/smoketest/ozonefs/hadoopo3fs.robot" id="s1" name="hadoop31-hadoopo3fs">
+<test id="s1-t1" name="Test hadoop dfs">
+<kw name="Generate Random String" library="String">
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<arguments>
+<arg>5</arg>
+<arg>[NUMBERS]</arg>
+</arguments>
+<assign>
+<var>${random}</var>
+</assign>
+<msg timestamp="20191004 20:15:33.568" level="INFO">${random} = 92224</msg>
+<status status="PASS" endtime="20191004 20:15:33.568" starttime="20191004 20:15:33.568"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>hdfs dfs -put /opt/hadoop/NOTICE.txt o3fs://bucket1.vol1/${PREFIX}-${random}</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191004 20:15:33.570" level="INFO">Running command 'hdfs dfs -put /opt/hadoop/NOTICE.txt o3fs://bucket1.vol1/ozone-92224 2&gt;&amp;1'.</msg>
+<msg timestamp="20191004 20:15:37.038" level="INFO">${rc} = 255</msg>
+<msg timestamp="20191004 20:15:37.038" level="INFO">${output} = 2019-10-04 20:15:34 INFO  Configuration:3318 - Removed undeclared tags:
+2019-10-04 20:15:34 INFO  Configuration:3318 - Removed undeclared tags:
+2019-10-04 20:15:36 INFO  Configuration:3318 - Removed u...</msg>
+<status status="PASS" endtime="20191004 20:15:37.038" starttime="20191004 20:15:33.569"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191004 20:15:37.039" level="INFO">2019-10-04 20:15:34 INFO  Configuration:3318 - Removed undeclared tags:
+2019-10-04 20:15:34 INFO  Configuration:3318 - Removed undeclared tags:
+2019-10-04 20:15:36 INFO  Configuration:3318 - Removed undeclared tags:
+2019-10-04 20:15:36 INFO  FluentPropertyBeanIntrospector:147 - Error when creating PropertyDescriptor for public final void org.apache.commons.configuration2.AbstractConfiguration.setProperty(java.lang.String,java.lang.Object)! Ignoring this property.
+2019-10-04 20:15:36 INFO  MetricsConfig:121 - loaded properties from hadoop-metrics2.properties
+2019-10-04 20:15:36 INFO  MetricsSystemImpl:374 - Scheduled Metric snapshot period at 10 second(s).
+2019-10-04 20:15:36 INFO  MetricsSystemImpl:191 - XceiverClientMetrics metrics system started
+-put: Fatal internal error
+java.lang.NullPointerException: client is null
+	at java.util.Objects.requireNonNull(Objects.java:228)
+	at org.apache.hadoop.hdds.scm.XceiverClientRatis.getClient(XceiverClientRatis.java:208)
+	at org.apache.hadoop.hdds.scm.XceiverClientRatis.sendRequestAsync(XceiverClientRatis.java:234)
+	at org.apache.hadoop.hdds.scm.XceiverClientRatis.sendCommandAsync(XceiverClientRatis.java:332)
+	at org.apache.hadoop.hdds.scm.storage.ContainerProtocolCalls.writeChunkAsync(ContainerProtocolCalls.java:310)
+	at org.apache.hadoop.hdds.scm.storage.BlockOutputStream.writeChunkToContainer(BlockOutputStream.java:601)
+	at org.apache.hadoop.hdds.scm.storage.BlockOutputStream.writeChunk(BlockOutputStream.java:459)
+	at org.apache.hadoop.hdds.scm.storage.BlockOutputStream.handleFlush(BlockOutputStream.java:470)
+	at org.apache.hadoop.hdds.scm.storage.BlockOutputStream.close(BlockOutputStream.java:493)
+	at org.apache.hadoop.ozone.client.io.BlockOutputStreamEntry.close(BlockOutputStreamEntry.java:143)
+	at org.apache.hadoop.ozone.client.io.KeyOutputStream.handleFlushOrClose(KeyOutputStream.java:435)
+	at org.apache.hadoop.ozone.client.io.KeyOutputStream.close(KeyOutputStream.java:473)
+	at org.apache.hadoop.fs.ozone.OzoneFSOutputStream.close(OzoneFSOutputStream.java:56)
+	at org.apache.hadoop.fs.FSDataOutputStream$PositionCache.close(FSDataOutputStream.java:72)
+	at org.apache.hadoop.fs.FSDataOutputStream.close(FSDataOutputStream.java:101)
+	at org.apache.hadoop.io.IOUtils.copyBytes(IOUtils.java:70)
+	at org.apache.hadoop.io.IOUtils.copyBytes(IOUtils.java:129)
+	at org.apache.hadoop.fs.shell.CommandWithDestination$TargetFileSystem.writeStreamToFile(CommandWithDestination.java:485)
+	at org.apache.hadoop.fs.shell.CommandWithDestination.copyStreamToTarget(CommandWithDestination.java:407)
+	at org.apache.hadoop.fs.shell.CommandWithDestination.copyFileToTarget(CommandWithDestination.java:342)
+	at org.apache.hadoop.fs.shell.CommandWithDestination.processPath(CommandWithDestination.java:277)
+	at org.apache.hadoop.fs.shell.CommandWithDestination.processPath(CommandWithDestination.java:262)
+	at org.apache.hadoop.fs.shell.Command.processPaths(Command.java:331)
+	at org.apache.hadoop.fs.shell.Command.processPathArgument(Command.java:303)
+	at org.apache.hadoop.fs.shell.CommandWithDestination.processPathArgument(CommandWithDestination.java:257)
+	at org.apache.hadoop.fs.shell.Command.processArgument(Command.java:285)
+	at org.apache.hadoop.fs.shell.Command.processArguments(Command.java:269)
+	at org.apache.hadoop.fs.shell.CommandWithDestination.processArguments(CommandWithDestination.java:228)
+	at org.apache.hadoop.fs.shell.CopyCommands$Put.processArguments(CopyCommands.java:284)
+	at org.apache.hadoop.fs.shell.FsCommand.processRawArguments(FsCommand.java:120)
+	at org.apache.hadoop.fs.shell.Command.run(Command.java:176)
+	at org.apache.hadoop.fs.FsShell.run(FsShell.java:328)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:76)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:90)
+	at org.apache.hadoop.fs.FsShell.main(FsShell.java:391)
+2019-10-04 20:15:36 INFO  Configuration:3318 - Removed undeclared tags:</msg>
+<status status="PASS" endtime="20191004 20:15:37.039" starttime="20191004 20:15:37.039"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191004 20:15:37.040" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<msg timestamp="20191004 20:15:37.040" level="FAIL">255 != 0</msg>
+<status status="FAIL" endtime="20191004 20:15:37.040" starttime="20191004 20:15:37.040"></status>
+</kw>
+<status status="FAIL" endtime="20191004 20:15:37.041" starttime="20191004 20:15:33.568"></status>
+</kw>
+<status status="FAIL" endtime="20191004 20:15:37.041" critical="yes" starttime="20191004 20:15:33.567">255 != 0</status>
+</test>
+<doc>Test ozone fs with hadoopfs</doc>
+<status status="FAIL" endtime="20191004 20:15:37.042" starttime="20191004 20:15:33.510"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="1" pass="0">Critical Tests</stat>
+<stat fail="1" pass="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat fail="1" id="s1" name="hadoop31-hadoopo3fs" pass="0">hadoop31-hadoopo3fs</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
