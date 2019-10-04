@@ -1,0 +1,8 @@
+# Failing tests: 
+
+ * [org.apache.hadoop.ozone.container.common.statemachine.commandhandler.TestBlockDeletion](hadoop-ozone/integration-test/org.apache.hadoop.ozone.container.common.statemachine.commandhandler.TestBlockDeletion.txt) ([output](hadoop-ozone/integration-test/org.apache.hadoop.ozone.container.common.statemachine.commandhandler.TestBlockDeletion-output.txt))
+ * [org.apache.hadoop.ozone.om.TestOmAcls](hadoop-ozone/integration-test/org.apache.hadoop.ozone.om.TestOmAcls.txt) ([output](hadoop-ozone/integration-test/org.apache.hadoop.ozone.om.TestOmAcls-output.txt))
+ * [org.apache.hadoop.ozone.security.acl.TestOzoneNativeAuthorizer](hadoop-ozone/integration-test/org.apache.hadoop.ozone.security.acl.TestOzoneNativeAuthorizer.txt) ([output](hadoop-ozone/integration-test/org.apache.hadoop.ozone.security.acl.TestOzoneNativeAuthorizer-output.txt))
+ * [org.apache.hadoop.ozone.container.common.statemachine.commandhandler.TestCloseContainerByPipeline](hadoop-ozone/integration-test/org.apache.hadoop.ozone.container.common.statemachine.commandhandler.TestCloseContainerByPipeline.txt) ([output](hadoop-ozone/integration-test/org.apache.hadoop.ozone.container.common.statemachine.commandhandler.TestCloseContainerByPipeline-output.txt))
+ * [org.apache.hadoop.ozone.client.rpc.TestWatchForCommit](hadoop-ozone/integration-test/org.apache.hadoop.ozone.client.rpc.TestWatchForCommit.txt) ([output](hadoop-ozone/integration-test/org.apache.hadoop.ozone.client.rpc.TestWatchForCommit-output.txt))
+ * [org.apache.hadoop.fs.ozone.TestOzoneFsHAURLs](hadoop-ozone/ozonefs/org.apache.hadoop.fs.ozone.TestOzoneFsHAURLs.txt) ([output](hadoop-ozone/ozonefs/org.apache.hadoop.fs.ozone.TestOzoneFsHAURLs-output.txt))
