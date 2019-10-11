@@ -1,0 +1,591 @@
+rm: cannot remove '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/result/*': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure
+Removing network ozonesecure_default
+Network ozonesecure_default not found.
+Creating network "ozonesecure_default" with the default driver
+Pulling scm (apache/ozone-runner:20190717-1)...
+20190717-1: Pulling from apache/ozone-runner
+Digest: sha256:00bb9519e6d236c50761dcc9c668ce7f04a74f160b916bf3baeaa26232389a69
+Status: Downloaded newer image for apache/ozone-runner:20190717-1
+Building kdc
+Step 1/16 : FROM openjdk:8u191-jdk-alpine3.9
+8u191-jdk-alpine3.9: Pulling from library/openjdk
+Digest: sha256:d2e2716147d1f7fe73b1a9f72a9cff7a7aa92d32eb8de4fffbfddc596e004984
+Status: Downloaded newer image for openjdk:8u191-jdk-alpine3.9
+ ---> e9ea51023687
+Step 2/16 : RUN apk add --update bash ca-certificates openssl krb5-server krb5 && rm -rf /var/cache/apk/* && update-ca-certificates
+ ---> Running in a0ab5b2ee4c5
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/x86_64/APKINDEX.tar.gz
+(1/15) Installing ncurses-terminfo-base (6.1_p20190105-r0)
+(2/15) Installing ncurses-terminfo (6.1_p20190105-r0)
+(3/15) Installing ncurses-libs (6.1_p20190105-r0)
+(4/15) Installing readline (7.0.003-r1)
+(5/15) Installing bash (4.4.19-r1)
+Executing bash-4.4.19-r1.post-install
+(6/15) Installing e2fsprogs-libs (1.44.5-r0)
+(7/15) Installing krb5 (1.15.5-r0)
+(8/15) Installing libev (4.25-r0)
+(9/15) Installing libverto-libev (0.3.0-r1)
+(10/15) Installing db (5.3.28-r1)
+(11/15) Installing libsasl (2.1.27-r1)
+(12/15) Installing libldap (2.4.48-r0)
+(13/15) Installing krb5-server-ldap (1.15.5-r0)
+(14/15) Installing krb5-server (1.15.5-r0)
+(15/15) Installing openssl (1.1.1d-r0)
+Executing busybox-1.29.3-r10.trigger
+OK: 117 MiB in 69 packages
+[91mWARNING: ca-certificates.crt does not contain exactly one certificate or CRL: skipping
+[0m ---> 5a63e3776d9e
+Step 3/16 : RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
+ ---> Running in 5664b9f22037
+[91mConnecting to github.com (192.30.255.113:443)
+[0m[91mConnecting to github-production-release-asset-2e65be.s3.amazonaws.com (52.216.136.27:443)
+[0m[91mdumb-init            100% |********************************| 46400  0:00:00 ETA
+
+[0m ---> 79c598b50d36
+Step 4/16 : RUN chmod +x /usr/local/bin/dumb-init
+ ---> Running in b6f7b7bacf85
+ ---> 9f83aeeceb2f
+Step 5/16 : RUN wget -O /root/issuer https://github.com/ajayydv/docker/raw/kdc/issuer
+ ---> Running in 45daa0e5d43a
+[91mConnecting to github.com (192.30.255.113:443)
+[0m[91mConnecting to raw.githubusercontent.com (151.101.128.133:443)
+[0m[91missuer               100% [0m[91m|********************************| 6586k  0:00:00 ETA
+
+[0m ---> 1d8025eef1b4
+Step 6/16 : RUN chmod +x /root/issuer
+ ---> Running in aad4d7ce2be1
+ ---> 0ab033bb1b77
+Step 7/16 : WORKDIR /opt
+ ---> 592f09a5a9e0
+Step 8/16 : ADD krb5.conf /etc/
+ ---> d80aff7fd433
+Step 9/16 : ADD kadm5.acl /var/lib/krb5kdc/kadm5.acl
+ ---> d85a0bef7f70
+Step 10/16 : RUN kdb5_util create -s -P Welcome1
+ ---> Running in b2dd6a2f3dd6
+Loading random data
+Initializing database '/var/lib/krb5kdc/principal' for realm 'EXAMPLE.COM',
+master key name 'K/M@EXAMPLE.COM'
+ ---> fa7afd6d2e52
+Step 11/16 : RUN kadmin.local -q "addprinc -randkey admin/admin@EXAMPLE.COM"
+ ---> Running in 387e8742e0ce
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+[91mWARNING: no policy specified for admin/admin@EXAMPLE.COM; defaulting to no policy
+[0mPrincipal "admin/admin@EXAMPLE.COM" created.
+ ---> 1b44cca80691
+Step 12/16 : RUN kadmin.local -q "ktadd -k /tmp/admin.keytab admin/admin@EXAMPLE.COM"
+ ---> Running in 6d344afef86d
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+Entry for principal admin/admin@EXAMPLE.COM with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:/tmp/admin.keytab.
+Entry for principal admin/admin@EXAMPLE.COM with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:/tmp/admin.keytab.
+ ---> d19f660cb5d5
+Step 13/16 : ADD launcher.sh .
+ ---> ca228a27a24f
+Step 14/16 : RUN chmod +x /opt/launcher.sh
+ ---> Running in 5f4e7534787b
+ ---> 8115dca2d5de
+Step 15/16 : RUN mkdir -p /data
+ ---> Running in 150139a02e0e
+ ---> 0bbfdddcfd50
+Step 16/16 : ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/opt/launcher.sh"]
+ ---> Running in a0565eaf3ef1
+ ---> 500288e70097
+Removing intermediate container 45daa0e5d43a
+Removing intermediate container aad4d7ce2be1
+Removing intermediate container 387e8742e0ce
+Removing intermediate container 6d344afef86d
+Removing intermediate container a0565eaf3ef1
+Removing intermediate container a0ab5b2ee4c5
+Removing intermediate container b6f7b7bacf85
+Removing intermediate container b2dd6a2f3dd6
+Removing intermediate container 5f4e7534787b
+Removing intermediate container 150139a02e0e
+Removing intermediate container 5664b9f22037
+Removing intermediate container 4547a45f117e
+[Warning] One or more build-args [buildno] were not consumed
+Successfully built 500288e70097
+Successfully tagged ozonesecure_kdc:latest
+Image for service kdc was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Pulling kms (apache/hadoop:3)...
+3: Pulling from apache/hadoop
+Digest: sha256:5cba355fd83de1bcce907abaa7f8ac3cfbc2ab74a09785ecdc892392883344f6
+Status: Downloaded newer image for apache/hadoop:3
+Creating ozonesecure_recon_1 ... 
+Creating ozonesecure_datanode_1 ... 
+Creating ozonesecure_datanode_2 ... 
+Creating ozonesecure_datanode_3 ... 
+Creating ozonesecure_scm_1      ... 
+Creating ozonesecure_om_1       ... 
+Creating ozonesecure_kms_1      ... 
+Creating ozonesecure_kdc_1      ... 
+Creating ozonesecure_s3g_1      ... 
+[6A[2KCreating ozonesecure_datanode_3 ... [32mdone[0m[6B[4A[2KCreating ozonesecure_om_1       ... [32mdone[0m[4B[7A[2KCreating ozonesecure_datanode_2 ... [32mdone[0m[7B[9A[2KCreating ozonesecure_recon_1    ... [32mdone[0m[9B[5A[2KCreating ozonesecure_scm_1      ... [32mdone[0m[5B[1A[2KCreating ozonesecure_s3g_1      ... [32mdone[0m[1B[3A[2KCreating ozonesecure_kms_1      ... [32mdone[0m[3B[2A[2KCreating ozonesecure_kdc_1      ... [32mdone[0m[2B[8A[2KCreating ozonesecure_datanode_1 ... [32mdone[0m[8Bkinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+kinit: Cannot contact any KDC for realm 'EXAMPLE.COM' while getting initial credentials
+0 datanode is up and healthy (until now)
+0 datanode is up and healthy (until now)
+3 datanodes are up and registered to the scm
+==============================================================================
+ozonesecure-kinit :: Kinit test user                                          
+==============================================================================
+Kinit                                                                 | PASS |
+------------------------------------------------------------------------------
+ozonesecure-kinit :: Kinit test user                                  | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+Output:  /tmp/smoketest/ozonesecure/result/robot-ozonesecure-ozonesecure-kinit-scm.xml
+==============================================================================
+ozonesecure-basic                                                             
+==============================================================================
+ozonesecure-basic.Basic :: Smoketest ozone cluster startup                    
+==============================================================================
+Check webui static resources                                          | PASS |
+------------------------------------------------------------------------------
+Start freon testing                                                   | PASS |
+------------------------------------------------------------------------------
+ozonesecure-basic.Basic :: Smoketest ozone cluster startup            | PASS |
+2 critical tests, 2 passed, 0 failed
+2 tests total, 2 passed, 0 failed
+==============================================================================
+ozonesecure-basic.Ozone-Shell :: Test ozone shell CLI usage                   
+==============================================================================
+RpcClient with port                                                   WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+| PASS |
+------------------------------------------------------------------------------
+RpcClient volume acls                                                 | PASS |
+------------------------------------------------------------------------------
+RpcClient bucket acls                                                 | PASS |
+------------------------------------------------------------------------------
+RpcClient key acls                                                    | PASS |
+------------------------------------------------------------------------------
+RpcClient without host                                                WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+| PASS |
+------------------------------------------------------------------------------
+RpcClient without scheme                                              WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+| PASS |
+------------------------------------------------------------------------------
+ozonesecure-basic.Ozone-Shell :: Test ozone shell CLI usage           | PASS |
+6 critical tests, 6 passed, 0 failed
+6 tests total, 6 passed, 0 failed
+==============================================================================
+ozonesecure-basic                                                     | PASS |
+8 critical tests, 8 passed, 0 failed
+8 tests total, 8 passed, 0 failed
+==============================================================================
+Output:  /tmp/smoketest/ozonesecure/result/robot-ozonesecure-ozonesecure-basic-scm.xml
+==============================================================================
+ozonesecure-security                                                          
+==============================================================================
+ozonesecure-security.Ozone-Secure-Fs :: Smoke test to start cluster with do...
+==============================================================================
+Create volume bucket with wrong credentials                           | PASS |
+------------------------------------------------------------------------------
+Create volume bucket with credentials                                 | PASS |
+------------------------------------------------------------------------------
+Check volume from ozonefs                                             | PASS |
+------------------------------------------------------------------------------
+Test Volume Acls                                                      | PASS |
+------------------------------------------------------------------------------
+Test Bucket Acls                                                      | PASS |
+------------------------------------------------------------------------------
+Test key Acls                                                         | PASS |
+------------------------------------------------------------------------------
+Test native authorizer                                                | PASS |
+------------------------------------------------------------------------------
+ozonesecure-security.Ozone-Secure-Fs :: Smoke test to start cluste... | PASS |
+7 critical tests, 7 passed, 0 failed
+7 tests total, 7 passed, 0 failed
+==============================================================================
+ozonesecure-security.Ozone-Secure-S3 :: Smoke test to start cluster with do...
+==============================================================================
+Secure S3 test Success                                                | PASS |
+------------------------------------------------------------------------------
+Secure S3 test Failure                                                | PASS |
+------------------------------------------------------------------------------
+ozonesecure-security.Ozone-Secure-S3 :: Smoke test to start cluste... | PASS |
+2 critical tests, 2 passed, 0 failed
+2 tests total, 2 passed, 0 failed
+==============================================================================
+ozonesecure-security                                                  | PASS |
+9 critical tests, 9 passed, 0 failed
+9 tests total, 9 passed, 0 failed
+==============================================================================
+Output:  /tmp/smoketest/ozonesecure/result/robot-ozonesecure-ozonesecure-security-scm.xml
+==============================================================================
+ozonesecure-ozonefs :: Ozonefs test                                           
+==============================================================================
+Create volume and bucket                                              | PASS |
+------------------------------------------------------------------------------
+Check volume from ozonefs                                             | PASS |
+------------------------------------------------------------------------------
+Run ozoneFS tests                                                     WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.security.authentication.util.KerberosUtil (file:/opt/hadoop/share/ozone/lib/hadoop-auth-3.2.0.jar) to method sun.security.krb5.Config.getInstance()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.security.authentication.util.KerberosUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+| PASS |
+------------------------------------------------------------------------------
+ozonesecure-ozonefs :: Ozonefs test                                   | PASS |
+3 critical tests, 3 passed, 0 failed
+3 tests total, 3 passed, 0 failed
+==============================================================================
+Output:  /tmp/smoketest/ozonesecure/result/robot-ozonesecure-ozonesecure-ozonefs-scm.xml
+==============================================================================
+ozonesecure-s3                                                                
+==============================================================================
+ozonesecure-s3.Awss3 :: S3 gateway test with aws cli                          
+==============================================================================
+File upload and directory list                                        | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Awss3 :: S3 gateway test with aws cli                  | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+ozonesecure-s3.Bucketcreate :: S3 gateway test with aws cli                   
+==============================================================================
+Create bucket which already exists                                    | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Bucketcreate :: S3 gateway test with aws cli           | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+ozonesecure-s3.Buckethead :: S3 gateway test with aws cli                     
+==============================================================================
+Head Bucket not existent                                              | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Buckethead :: S3 gateway test with aws cli             | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+ozonesecure-s3.Bucketlist :: S3 gateway test with aws cli                     
+==============================================================================
+List buckets                                                          | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Bucketlist :: S3 gateway test with aws cli             | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+ozonesecure-s3.MultipartUpload :: S3 gateway test with aws cli                
+==============================================================================
+Test Multipart Upload                                                 | PASS |
+------------------------------------------------------------------------------
+Test Multipart Upload Complete                                        | PASS |
+------------------------------------------------------------------------------
+Test Multipart Upload Complete Entity too small                       | PASS |
+------------------------------------------------------------------------------
+Test Multipart Upload Complete Invalid part                           | PASS |
+------------------------------------------------------------------------------
+Test abort Multipart upload                                           | PASS |
+------------------------------------------------------------------------------
+Test abort Multipart upload with invalid uploadId                     | PASS |
+------------------------------------------------------------------------------
+Upload part with Incorrect uploadID                                   | PASS |
+------------------------------------------------------------------------------
+Test list parts                                                       | FAIL |
+/s32724f42bcd3225359401cb62da89c51d/bucket-22985/multipartKey5102943046045794466 != /s32724f42bcd3225359401cb62da89c51d/bucket-22985/multipartKey5102943054070939812
+------------------------------------------------------------------------------
+Test Multipart Upload with the simplified aws s3 cp API               | PASS |
+------------------------------------------------------------------------------
+Test Multipart Upload Put With Copy                                   | PASS |
+------------------------------------------------------------------------------
+Test Multipart Upload Put With Copy and range                         | FAIL |
+255 != 0
+------------------------------------------------------------------------------
+Test Multipart Upload list                                            | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.MultipartUpload :: S3 gateway test with aws cli        | FAIL |
+12 critical tests, 10 passed, 2 failed
+12 tests total, 10 passed, 2 failed
+==============================================================================
+ozonesecure-s3.Objectcopy :: S3 gateway test with aws cli                     
+==============================================================================
+Copy Object Happy Scenario                                            | PASS |
+------------------------------------------------------------------------------
+Copy Object Where Bucket is not available                             | PASS |
+------------------------------------------------------------------------------
+Copy Object Where both source and dest are same with change to sto... | PASS |
+------------------------------------------------------------------------------
+Copy Object Where Key not available                                   | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Objectcopy :: S3 gateway test with aws cli             | PASS |
+4 critical tests, 4 passed, 0 failed
+4 tests total, 4 passed, 0 failed
+==============================================================================
+ozonesecure-s3.Objectdelete :: S3 gateway test with aws cli                   
+==============================================================================
+Delete file with s3api                                                | PASS |
+------------------------------------------------------------------------------
+Delete file with s3api, file doesn't exist                            | PASS |
+------------------------------------------------------------------------------
+Delete dir with s3api                                                 | PASS |
+------------------------------------------------------------------------------
+Delete file with s3api, file doesn't exist, prefix of a real file     | PASS |
+------------------------------------------------------------------------------
+Delete file with s3api, bucket doesn't exist                          | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Objectdelete :: S3 gateway test with aws cli           | PASS |
+5 critical tests, 5 passed, 0 failed
+5 tests total, 5 passed, 0 failed
+==============================================================================
+ozonesecure-s3.Objectmultidelete :: S3 gateway test with aws cli              
+==============================================================================
+Delete file with multi delete                                         | PASS |
+------------------------------------------------------------------------------
+ozonesecure-s3.Objectmultidelete :: S3 gateway test with aws cli      | PASS |
+1 critical test, 1 passed, 0 failed
+1 test total, 1 passed, 0 failed
+==============================================================================
+ozonesecure-s3.Objectputget :: S3 gateway test with aws cli                   
+==============================================================================
+Put object to s3                                                      | FAIL |
+Setup failed:
+1 != 0
+------------------------------------------------------------------------------
+Get object from s3                                                    | FAIL |
+Setup failed:
+1 != 0
+------------------------------------------------------------------------------
+Get Partial object from s3 with both start and endoffset              | FAIL |
+Setup failed:
+255 != 0
+------------------------------------------------------------------------------
+Get Partial object from s3 with both start and endoffset(start off... | FAIL |
+'
+An error occurred (NoSuchKey) when calling the GetObject operation: The specified key does not exist' does not contain 'InvalidRange'
+------------------------------------------------------------------------------
+Get Partial object from s3 with both start and endoffset(end offse... | FAIL |
+255 != 0
+------------------------------------------------------------------------------
+Get Partial object from s3 with only start offset                     | FAIL |
+255 != 0
+------------------------------------------------------------------------------
+Get Partial object from s3 with both start and endoffset which are... | FAIL |
+255 != 0
+------------------------------------------------------------------------------
+Get Partial object from s3 to get last n bytes                        | FAIL |
+Setup failed:
+1 != 0
+------------------------------------------------------------------------------
+Incorrect values for end and start offset                             | FAIL |
+Setup failed:
+1 != 0
+------------------------------------------------------------------------------
+Zero byte file                                                        | FAIL |
+Setup failed:
+OSError: [Errno 12] Cannot allocate memory
+------------------------------------------------------------------------------
+ozonesecure-s3.Objectputget :: S3 gateway test with aws cli           | FAIL |
+10 critical tests, 0 passed, 10 failed
+10 tests total, 0 passed, 10 failed
+==============================================================================
+ozonesecure-s3.Webui :: S3 gateway web ui test                                
+==============================================================================
+sh: fork: Cannot allocate memory
+S3 Gateway Web UI                                                     | FAIL |
+Parent suite setup failed:
+254 != 0
+------------------------------------------------------------------------------
+ozonesecure-s3.Webui :: S3 gateway web ui test                        | FAIL |
+Suite setup failed:
+254 != 0
+
+1 critical test, 0 passed, 1 failed
+1 test total, 0 passed, 1 failed
+==============================================================================
+ozonesecure-s3                                                        | FAIL |
+37 critical tests, 24 passed, 13 failed
+37 tests total, 24 passed, 13 failed
+==============================================================================
+Output:  /tmp/smoketest/ozonesecure/result/robot-ozonesecure-ozonesecure-s3-s3g.xml
+Traceback (most recent call last):
+  File "/usr/bin/docker-compose", line 10, in <module>
+    sys.exit(main())
+  File "/usr/lib/python2.7/site-packages/compose/cli/main.py", line 71, in main
+    command()
+  File "/usr/lib/python2.7/site-packages/compose/cli/main.py", line 127, in perform_command
+    handler(command, command_options)
+  File "/usr/lib/python2.7/site-packages/compose/cli/main.py", line 655, in logs
+    event_stream=self.project.events(service_names=options['SERVICE'])).run()
+  File "/usr/lib/python2.7/site-packages/compose/cli/log_printer.py", line 80, in run
+    thread_map = build_thread_map(self.containers, self.presenters, thread_args)
+  File "/usr/lib/python2.7/site-packages/compose/cli/log_printer.py", line 137, in build_thread_map
+    for container in initial_containers
+  File "/usr/lib/python2.7/site-packages/compose/cli/log_printer.py", line 137, in <dictcomp>
+    for container in initial_containers
+  File "/usr/lib/python2.7/site-packages/compose/cli/log_printer.py", line 130, in build_thread
+    tailer.start()
+  File "/usr/lib/python2.7/threading.py", line 736, in start
+    _start_new_thread(self.__bootstrap, ())
+thread.error: can't start new thread
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozonesecure is FAILED!!!!
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3-haproxy
+./test.sh: fork: Out of memory
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3-haproxy is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozones3-haproxy/result/robot-*.xml': No such file or directory
+Executing test in /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone
+./test.sh: fork: Out of memory
+ERROR: Test execution of /workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone is FAILED!!!!
+cp: cannot stat '/workdir/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT/compose/ozone/result/robot-*.xml': No such file or directory
+./test-all.sh: fork: Out of memory
+cp: cannot stat '/tmp/log/pr/pr-hdds-1569-wxwzw/acceptance/log.html': No such file or directory
