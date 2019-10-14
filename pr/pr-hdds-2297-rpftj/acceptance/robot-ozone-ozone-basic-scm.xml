@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot rpa="false" generated="20191014 10:04:14.827" generator="Robot 3.1.2 (Python 2.7.5 on linux2)">
+<suite source="/opt/hadoop/smoketest/basic/basic.robot" id="s1" name="ozone-basic">
+<test id="s1-t1" name="Check webui static resources">
+<kw name="Run Keyword If" library="BuiltIn">
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<arguments>
+<arg>'${SECURITY_ENABLED}' == 'true'</arg>
+<arg>Kinit HTTP user</arg>
+</arguments>
+<status status="PASS" endtime="20191014 10:04:14.877" starttime="20191014 10:04:14.877"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>curl --negotiate -u : -s -I http://scm:9876/static/bootstrap-3.4.1/js/bootstrap.min.js</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191014 10:04:14.880" level="INFO">Running command 'curl --negotiate -u : -s -I http://scm:9876/static/bootstrap-3.4.1/js/bootstrap.min.js 2&gt;&amp;1'.</msg>
+<msg timestamp="20191014 10:04:14.901" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191014 10:04:14.901" level="INFO">${output} = HTTP/1.1 200 OK
+Date: Mon, 14 Oct 2019 10:04:14 GMT
+X-Content-Type-Options: nosniff
+X-FRAME-OPTIONS: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+Last-Modified: Mon, 14 Oct 2019 09:41:30 GMT
+Content-Typ...</msg>
+<status status="PASS" endtime="20191014 10:04:14.901" starttime="20191014 10:04:14.878"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191014 10:04:14.902" level="INFO">HTTP/1.1 200 OK
+Date: Mon, 14 Oct 2019 10:04:14 GMT
+X-Content-Type-Options: nosniff
+X-FRAME-OPTIONS: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+Last-Modified: Mon, 14 Oct 2019 09:41:30 GMT
+Content-Type: application/javascript
+Accept-Ranges: bytes
+Content-Length: 39680
+</msg>
+<status status="PASS" endtime="20191014 10:04:14.902" starttime="20191014 10:04:14.902"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191014 10:04:14.903" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191014 10:04:14.903" starttime="20191014 10:04:14.903"></status>
+</kw>
+<msg timestamp="20191014 10:04:14.903" level="INFO">${result} = HTTP/1.1 200 OK
+Date: Mon, 14 Oct 2019 10:04:14 GMT
+X-Content-Type-Options: nosniff
+X-FRAME-OPTIONS: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+Last-Modified: Mon, 14 Oct 2019 09:41:30 GMT
+Content-Typ...</msg>
+<status status="PASS" endtime="20191014 10:04:14.903" starttime="20191014 10:04:14.878"></status>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>200</arg>
+</arguments>
+<status status="PASS" endtime="20191014 10:04:14.904" starttime="20191014 10:04:14.904"></status>
+</kw>
+<status status="PASS" endtime="20191014 10:04:14.904" critical="yes" starttime="20191014 10:04:14.876"></status>
+</test>
+<test id="s1-t2" name="Start freon testing">
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone freon randomkeys --numOfVolumes 5 --numOfBuckets 5 --numOfKeys 5 --numOfThreads 1</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191014 10:04:14.907" level="INFO">Running command 'ozone freon randomkeys --numOfVolumes 5 --numOfBuckets 5 --numOfKeys 5 --numOfThreads 1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191014 10:04:15.121" level="INFO">${rc} = 1</msg>
+<msg timestamp="20191014 10:04:15.121" level="INFO">${output} = [0.080s][warning][os,thread] Failed to start thread - pthread_create failed (EAGAIN) for attributes: stacksize: 1024k, guardsize: 0k, detached.
+Error: A JNI error has occurred, please check your insta...</msg>
+<status status="PASS" endtime="20191014 10:04:15.121" starttime="20191014 10:04:14.906"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191014 10:04:15.122" level="INFO">[0.080s][warning][os,thread] Failed to start thread - pthread_create failed (EAGAIN) for attributes: stacksize: 1024k, guardsize: 0k, detached.
+Error: A JNI error has occurred, please check your installation and try again
+Exception in thread "main" java.lang.OutOfMemoryError: unable to create native thread: possibly out of memory or process/resource limits reached
+	at java.base/java.lang.Thread.start0(Native Method)
+	at java.base/java.lang.Thread.start(Thread.java:803)
+	at java.base/jdk.internal.ref.CleanerImpl.start(CleanerImpl.java:118)
+	at java.base/java.lang.ref.Cleaner.create(Cleaner.java:203)
+	at java.base/jdk.internal.ref.CleanerFactory.&lt;clinit&gt;(CleanerFactory.java:42)
+	at java.base/java.util.zip.ZipFile$CleanableResource.&lt;init&gt;(ZipFile.java:724)
+	at java.base/java.util.zip.ZipFile$CleanableResource.get(ZipFile.java:844)
+	at java.base/java.util.zip.ZipFile.&lt;init&gt;(ZipFile.java:247)
+	at java.base/java.util.zip.ZipFile.&lt;init&gt;(ZipFile.java:177)
+	at java.base/java.util.jar.JarFile.&lt;init&gt;(JarFile.java:346)
+	at java.base/jdk.internal.loader.URLClassPath$JarLoader.getJarFile(URLClassPath.java:813)
+	at java.base/jdk.internal.loader.URLClassPath$JarLoader$1.run(URLClassPath.java:758)
+	at java.base/jdk.internal.loader.URLClassPath$JarLoader$1.run(URLClassPath.java:751)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/jdk.internal.loader.URLClassPath$JarLoader.ensureOpen(URLClassPath.java:750)
+	at java.base/jdk.internal.loader.URLClassPath$JarLoader.&lt;init&gt;(URLClassPath.java:725)
+	at java.base/jdk.internal.loader.URLClassPath$3.run(URLClassPath.java:493)
+	at java.base/jdk.internal.loader.URLClassPath$3.run(URLClassPath.java:476)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/jdk.internal.loader.URLClassPath.getLoader(URLClassPath.java:475)
+	at java.base/jdk.internal.loader.URLClassPath.getLoader(URLClassPath.java:444)
+	at java.base/jdk.internal.loader.URLClassPath.getResource(URLClassPath.java:313)
+	at java.base/jdk.internal.loader.BuiltinClassLoader.findClassOnClassPathOrNull(BuiltinClassLoader.java:697)
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClassOrNull(BuiltinClassLoader.java:623)
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:581)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:178)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:521)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:398)
+	at java.base/sun.launcher.LauncherHelper.loadMainClass(LauncherHelper.java:760)
+	at java.base/sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:655)</msg>
+<status status="PASS" endtime="20191014 10:04:15.122" starttime="20191014 10:04:15.121"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191014 10:04:15.123" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<msg timestamp="20191014 10:04:15.123" level="FAIL">1 != 0</msg>
+<status status="FAIL" endtime="20191014 10:04:15.123" starttime="20191014 10:04:15.122"></status>
+</kw>
+<status status="FAIL" endtime="20191014 10:04:15.123" starttime="20191014 10:04:14.905"></status>
+</kw>
+<status status="FAIL" endtime="20191014 10:04:15.124" critical="yes" starttime="20191014 10:04:14.904">1 != 0</status>
+</test>
+<doc>Smoketest ozone cluster startup</doc>
+<status status="FAIL" endtime="20191014 10:04:15.124" starttime="20191014 10:04:14.828"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="1" pass="1">Critical Tests</stat>
+<stat fail="1" pass="1">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat fail="1" id="s1" name="ozone-basic" pass="1">ozone-basic</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
