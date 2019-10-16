@@ -1,0 +1,1171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot rpa="false" generated="20191016 20:42:50.862" generator="Robot 3.1.2 (Python 2.7.5 on linux2)">
+<suite source="/opt/hadoop/smoketest/gdpr/gdpr.robot" id="s1" name="ozone-gdpr">
+<kw type="setup" name="Generate volume">
+<kw name="Generate Random String" library="String">
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<arguments>
+<arg>5</arg>
+<arg>[LOWER]</arg>
+</arguments>
+<assign>
+<var>${random}</var>
+</assign>
+<msg timestamp="20191016 20:42:50.912" level="INFO">${random} = rkxip</msg>
+<status status="PASS" endtime="20191016 20:42:50.913" starttime="20191016 20:42:50.912"></status>
+</kw>
+<kw name="Set Suite Variable" library="BuiltIn">
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<arguments>
+<arg>${volume}</arg>
+<arg>${random}</arg>
+</arguments>
+<msg timestamp="20191016 20:42:50.913" level="INFO">${volume} = rkxip</msg>
+<status status="PASS" endtime="20191016 20:42:50.913" starttime="20191016 20:42:50.913"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:42:50.913" starttime="20191016 20:42:50.911"></status>
+</kw>
+<test id="s1-t1" name="Test GDPR disabled">
+<kw name="Test GDPR(disabled) without explicit options">
+<arguments>
+<arg>${volume}</arg>
+</arguments>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh volume create /${volume} --quota 100TB</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:42:50.916" level="INFO">Running command 'ozone sh volume create /rkxip --quota 100TB 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:42:53.232" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:42:53.232" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:42:53.233" starttime="20191016 20:42:50.915"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:42:53.234" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:42:53.235" starttime="20191016 20:42:53.233"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:42:53.236" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:42:53.236" starttime="20191016 20:42:53.235"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:42:53.236" starttime="20191016 20:42:50.914"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket create /${volume}/mybucket1</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:42:53.240" level="INFO">Running command 'ozone sh bucket create /rkxip/mybucket1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:42:55.485" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:42:55.485" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:42:55.485" starttime="20191016 20:42:53.238"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:42:55.486" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:42:55.487" starttime="20191016 20:42:55.486"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:42:55.487" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:42:55.487" starttime="20191016 20:42:55.487"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:42:55.488" starttime="20191016 20:42:53.237"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket info /${volume}/mybucket1 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket1") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:42:55.491" level="INFO">Running command 'ozone sh bucket info /rkxip/mybucket1 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket1") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:42:57.838" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:42:57.838" level="INFO">${output} = null</msg>
+<status status="PASS" endtime="20191016 20:42:57.838" starttime="20191016 20:42:55.489"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:42:57.839" level="INFO">null</msg>
+<status status="PASS" endtime="20191016 20:42:57.839" starttime="20191016 20:42:57.838"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:42:57.840" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:42:57.840" starttime="20191016 20:42:57.839"></status>
+</kw>
+<msg timestamp="20191016 20:42:57.840" level="INFO">${result} = null</msg>
+<status status="PASS" endtime="20191016 20:42:57.841" starttime="20191016 20:42:55.488"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>null</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:42:57.841" starttime="20191016 20:42:57.841"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key put /${volume}/mybucket1/mykey /opt/hadoop/NOTICE.txt</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:42:57.843" level="INFO">Running command 'ozone sh key put /rkxip/mybucket1/mykey /opt/hadoop/NOTICE.txt 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:02.671" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:02.671" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-th...</msg>
+<status status="PASS" endtime="20191016 20:43:02.671" starttime="20191016 20:42:57.842"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:02.672" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-thirdparty-misc-0.2.0.jar) to field java.nio.Buffer.address
+WARNING: Please consider reporting this to the maintainers of org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191016 20:43:02.673" starttime="20191016 20:43:02.671"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:02.673" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:02.674" starttime="20191016 20:43:02.673"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:02.674" starttime="20191016 20:42:57.841"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>rm -f NOTICE.txt.1</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:02.677" level="INFO">Running command 'rm -f NOTICE.txt.1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:02.683" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:02.683" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:02.683" starttime="20191016 20:43:02.675"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:02.685" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:02.685" starttime="20191016 20:43:02.684"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:02.685" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:02.686" starttime="20191016 20:43:02.685"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:02.686" starttime="20191016 20:43:02.674"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key info /${volume}/mybucket1/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:02.689" level="INFO">Running command 'ozone sh key info /rkxip/mybucket1/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:04.969" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:04.969" level="INFO">${output} = null</msg>
+<status status="PASS" endtime="20191016 20:43:04.970" starttime="20191016 20:43:02.687"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:04.971" level="INFO">null</msg>
+<status status="PASS" endtime="20191016 20:43:04.971" starttime="20191016 20:43:04.970"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:04.972" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:04.973" starttime="20191016 20:43:04.972"></status>
+</kw>
+<msg timestamp="20191016 20:43:04.973" level="INFO">${result} = null</msg>
+<status status="PASS" endtime="20191016 20:43:04.973" starttime="20191016 20:43:02.686"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>null</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:04.974" starttime="20191016 20:43:04.973"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key delete /${volume}/mybucket1/mykey</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:04.978" level="INFO">Running command 'ozone sh key delete /rkxip/mybucket1/mykey 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:07.156" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:07.156" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:07.156" starttime="20191016 20:43:04.975"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:07.158" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:07.158" starttime="20191016 20:43:07.157"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:07.159" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:07.159" starttime="20191016 20:43:07.158"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:07.160" starttime="20191016 20:43:04.974"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:07.160" starttime="20191016 20:42:50.914"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:07.160" critical="yes" starttime="20191016 20:42:50.914"></status>
+</test>
+<test id="s1-t2" name="Test GDPR --enforcegdpr=true">
+<kw name="Test GDPR with --enforcegdpr=true">
+<arguments>
+<arg>${volume}</arg>
+</arguments>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket create --enforcegdpr=true /${volume}/mybucket2</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:07.165" level="INFO">Running command 'ozone sh bucket create --enforcegdpr=true /rkxip/mybucket2 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:09.353" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:09.353" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:09.353" starttime="20191016 20:43:07.163"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:09.354" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:09.354" starttime="20191016 20:43:09.354"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:09.355" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:09.355" starttime="20191016 20:43:09.355"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:09.356" starttime="20191016 20:43:07.162"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket info /${volume}/mybucket2 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket2") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:09.360" level="INFO">Running command 'ozone sh bucket info /rkxip/mybucket2 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket2") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:11.639" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:11.639" level="INFO">${output} = true</msg>
+<status status="PASS" endtime="20191016 20:43:11.639" starttime="20191016 20:43:09.357"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:11.641" level="INFO">true</msg>
+<status status="PASS" endtime="20191016 20:43:11.641" starttime="20191016 20:43:11.640"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:11.641" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:11.642" starttime="20191016 20:43:11.641"></status>
+</kw>
+<msg timestamp="20191016 20:43:11.642" level="INFO">${result} = true</msg>
+<status status="PASS" endtime="20191016 20:43:11.642" starttime="20191016 20:43:09.356"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>true</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:11.643" starttime="20191016 20:43:11.642"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key put /${volume}/mybucket2/mykey /opt/hadoop/NOTICE.txt</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:11.645" level="INFO">Running command 'ozone sh key put /rkxip/mybucket2/mykey /opt/hadoop/NOTICE.txt 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:16.095" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:16.095" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-th...</msg>
+<status status="PASS" endtime="20191016 20:43:16.095" starttime="20191016 20:43:11.643"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:16.097" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-thirdparty-misc-0.2.0.jar) to field java.nio.Buffer.address
+WARNING: Please consider reporting this to the maintainers of org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191016 20:43:16.097" starttime="20191016 20:43:16.096"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:16.098" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:16.098" starttime="20191016 20:43:16.098"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:16.099" starttime="20191016 20:43:11.643"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>rm -f NOTICE.txt.1</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:16.103" level="INFO">Running command 'rm -f NOTICE.txt.1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:16.110" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:16.110" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:16.110" starttime="20191016 20:43:16.100"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:16.112" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:16.112" starttime="20191016 20:43:16.111"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:16.113" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:16.113" starttime="20191016 20:43:16.112"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:16.114" starttime="20191016 20:43:16.099"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key info /${volume}/mybucket2/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:16.118" level="INFO">Running command 'ozone sh key info /rkxip/mybucket2/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:18.336" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:18.337" level="INFO">${output} = true</msg>
+<status status="PASS" endtime="20191016 20:43:18.337" starttime="20191016 20:43:16.115"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:18.338" level="INFO">true</msg>
+<status status="PASS" endtime="20191016 20:43:18.338" starttime="20191016 20:43:18.337"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:18.339" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:18.339" starttime="20191016 20:43:18.338"></status>
+</kw>
+<msg timestamp="20191016 20:43:18.339" level="INFO">${result} = true</msg>
+<status status="PASS" endtime="20191016 20:43:18.339" starttime="20191016 20:43:16.114"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>true</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:18.340" starttime="20191016 20:43:18.339"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key delete /${volume}/mybucket2/mykey</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:18.342" level="INFO">Running command 'ozone sh key delete /rkxip/mybucket2/mykey 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:20.640" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:20.640" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:20.640" starttime="20191016 20:43:18.340"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:20.642" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:20.642" starttime="20191016 20:43:20.641"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:20.643" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:20.643" starttime="20191016 20:43:20.642"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:20.643" starttime="20191016 20:43:18.340"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:20.643" starttime="20191016 20:43:07.162"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:20.644" critical="yes" starttime="20191016 20:43:07.161"></status>
+</test>
+<test id="s1-t3" name="Test GDPR -g=true">
+<kw name="Test GDPR with -g=true">
+<arguments>
+<arg>${volume}</arg>
+</arguments>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket create -g=true /${volume}/mybucket3</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:20.649" level="INFO">Running command 'ozone sh bucket create -g=true /rkxip/mybucket3 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:22.807" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:22.807" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:22.807" starttime="20191016 20:43:20.647"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:22.808" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:22.808" starttime="20191016 20:43:22.807"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:22.809" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:22.809" starttime="20191016 20:43:22.808"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:22.810" starttime="20191016 20:43:20.646"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket info /${volume}/mybucket3 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket3") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:22.812" level="INFO">Running command 'ozone sh bucket info /rkxip/mybucket3 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket3") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:25.158" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:25.158" level="INFO">${output} = true</msg>
+<status status="PASS" endtime="20191016 20:43:25.158" starttime="20191016 20:43:22.811"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:25.160" level="INFO">true</msg>
+<status status="PASS" endtime="20191016 20:43:25.160" starttime="20191016 20:43:25.159"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:25.161" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:25.161" starttime="20191016 20:43:25.160"></status>
+</kw>
+<msg timestamp="20191016 20:43:25.162" level="INFO">${result} = true</msg>
+<status status="PASS" endtime="20191016 20:43:25.162" starttime="20191016 20:43:22.810"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>true</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:25.163" starttime="20191016 20:43:25.162"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key put /${volume}/mybucket3/mykey /opt/hadoop/NOTICE.txt</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:25.166" level="INFO">Running command 'ozone sh key put /rkxip/mybucket3/mykey /opt/hadoop/NOTICE.txt 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:29.767" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:29.767" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-th...</msg>
+<status status="PASS" endtime="20191016 20:43:29.767" starttime="20191016 20:43:25.164"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:29.768" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-thirdparty-misc-0.2.0.jar) to field java.nio.Buffer.address
+WARNING: Please consider reporting this to the maintainers of org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191016 20:43:29.768" starttime="20191016 20:43:29.768"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:29.769" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:29.769" starttime="20191016 20:43:29.769"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:29.770" starttime="20191016 20:43:25.163"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>rm -f NOTICE.txt.1</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:29.773" level="INFO">Running command 'rm -f NOTICE.txt.1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:29.780" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:29.780" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:29.780" starttime="20191016 20:43:29.771"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:29.782" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:29.782" starttime="20191016 20:43:29.781"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:29.783" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:29.783" starttime="20191016 20:43:29.782"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:29.784" starttime="20191016 20:43:29.770"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key info /${volume}/mybucket3/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:29.787" level="INFO">Running command 'ozone sh key info /rkxip/mybucket3/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:32.077" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:32.078" level="INFO">${output} = true</msg>
+<status status="PASS" endtime="20191016 20:43:32.078" starttime="20191016 20:43:29.785"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:32.080" level="INFO">true</msg>
+<status status="PASS" endtime="20191016 20:43:32.080" starttime="20191016 20:43:32.079"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:32.081" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:32.081" starttime="20191016 20:43:32.080"></status>
+</kw>
+<msg timestamp="20191016 20:43:32.082" level="INFO">${result} = true</msg>
+<status status="PASS" endtime="20191016 20:43:32.082" starttime="20191016 20:43:29.784"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>true</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:32.083" starttime="20191016 20:43:32.082"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key delete /${volume}/mybucket3/mykey</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:32.087" level="INFO">Running command 'ozone sh key delete /rkxip/mybucket3/mykey 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:34.293" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:34.294" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:34.294" starttime="20191016 20:43:32.084"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:34.295" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:34.296" starttime="20191016 20:43:34.295"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:34.297" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:34.297" starttime="20191016 20:43:34.296"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:34.297" starttime="20191016 20:43:32.083"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:34.298" starttime="20191016 20:43:20.645"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:34.298" critical="yes" starttime="20191016 20:43:20.644"></status>
+</test>
+<test id="s1-t4" name="Test GDPR -g=false">
+<kw name="Test GDPR with -g=false">
+<arguments>
+<arg>${volume}</arg>
+</arguments>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket create /${volume}/mybucket4</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:34.304" level="INFO">Running command 'ozone sh bucket create /rkxip/mybucket4 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:36.591" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:36.591" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:36.591" starttime="20191016 20:43:34.301"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:36.592" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:36.592" starttime="20191016 20:43:36.592"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:36.593" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:36.593" starttime="20191016 20:43:36.593"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:36.594" starttime="20191016 20:43:34.300"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh bucket info /${volume}/mybucket4 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket4") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:36.597" level="INFO">Running command 'ozone sh bucket info /rkxip/mybucket4 | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mybucket4") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:38.828" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:38.828" level="INFO">${output} = null</msg>
+<status status="PASS" endtime="20191016 20:43:38.828" starttime="20191016 20:43:36.595"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:38.830" level="INFO">null</msg>
+<status status="PASS" endtime="20191016 20:43:38.830" starttime="20191016 20:43:38.829"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:38.831" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:38.831" starttime="20191016 20:43:38.831"></status>
+</kw>
+<msg timestamp="20191016 20:43:38.832" level="INFO">${result} = null</msg>
+<status status="PASS" endtime="20191016 20:43:38.832" starttime="20191016 20:43:36.594"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>null</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:38.833" starttime="20191016 20:43:38.833"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key put /${volume}/mybucket4/mykey /opt/hadoop/NOTICE.txt</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:38.837" level="INFO">Running command 'ozone sh key put /rkxip/mybucket4/mykey /opt/hadoop/NOTICE.txt 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:43.324" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:43.324" level="INFO">${output} = WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-th...</msg>
+<status status="PASS" endtime="20191016 20:43:43.324" starttime="20191016 20:43:38.835"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:43.326" level="INFO">WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil (file:/opt/hadoop/share/ozone/lib/ratis-thirdparty-misc-0.2.0.jar) to field java.nio.Buffer.address
+WARNING: Please consider reporting this to the maintainers of org.apache.ratis.thirdparty.com.google.protobuf.UnsafeUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release</msg>
+<status status="PASS" endtime="20191016 20:43:43.326" starttime="20191016 20:43:43.325"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:43.327" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:43.327" starttime="20191016 20:43:43.327"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:43.328" starttime="20191016 20:43:38.834"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>rm -f NOTICE.txt.1</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:43.332" level="INFO">Running command 'rm -f NOTICE.txt.1 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:43.339" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:43.339" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:43.339" starttime="20191016 20:43:43.329"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:43.341" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:43.341" starttime="20191016 20:43:43.340"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:43.342" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:43.342" starttime="20191016 20:43:43.341"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:43.343" starttime="20191016 20:43:43.328"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key info /${volume}/mybucket4/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled'</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:43.347" level="INFO">Running command 'ozone sh key info /rkxip/mybucket4/mykey | grep -Ev 'Removed|WARN|DEBUG|ERROR|INFO|TRACE' | jq -r '. | select(.name=="mykey") | .metadata | .gdprEnabled' 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:45.620" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:45.621" level="INFO">${output} = null</msg>
+<status status="PASS" endtime="20191016 20:43:45.621" starttime="20191016 20:43:43.345"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:45.623" level="INFO">null</msg>
+<status status="PASS" endtime="20191016 20:43:45.623" starttime="20191016 20:43:45.622"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:45.624" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:45.624" starttime="20191016 20:43:45.623"></status>
+</kw>
+<msg timestamp="20191016 20:43:45.625" level="INFO">${result} = null</msg>
+<status status="PASS" endtime="20191016 20:43:45.625" starttime="20191016 20:43:43.343"></status>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<doc>Fails if the given objects are unequal.</doc>
+<arguments>
+<arg>${result}</arg>
+<arg>null</arg>
+</arguments>
+<status status="PASS" endtime="20191016 20:43:45.626" starttime="20191016 20:43:45.625"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>ozone sh key delete /${volume}/mybucket4/mykey</arg>
+</arguments>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 20:43:45.630" level="INFO">Running command 'ozone sh key delete /rkxip/mybucket4/mykey 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 20:43:47.979" level="INFO">${rc} = 0</msg>
+<msg timestamp="20191016 20:43:47.979" level="INFO">${output} = </msg>
+<status status="PASS" endtime="20191016 20:43:47.979" starttime="20191016 20:43:45.627"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 20:43:47.981" level="INFO"></msg>
+<status status="PASS" endtime="20191016 20:43:47.981" starttime="20191016 20:43:47.980"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 20:43:47.982" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" endtime="20191016 20:43:47.983" starttime="20191016 20:43:47.982"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:47.983" starttime="20191016 20:43:45.626"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:47.983" starttime="20191016 20:43:34.300"></status>
+</kw>
+<status status="PASS" endtime="20191016 20:43:47.984" critical="yes" starttime="20191016 20:43:34.299"></status>
+</test>
+<doc>Smoketest Ozone GDPR Feature</doc>
+<status status="PASS" endtime="20191016 20:43:47.986" starttime="20191016 20:42:50.862"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="0" pass="4">Critical Tests</stat>
+<stat fail="0" pass="4">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat fail="0" id="s1" name="ozone-gdpr" pass="4">ozone-gdpr</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
