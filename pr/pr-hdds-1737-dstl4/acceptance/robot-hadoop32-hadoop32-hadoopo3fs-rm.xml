@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot rpa="false" generated="20191016 07:04:27.589" generator="Robot 3.1.1 (Python 2.7.5 on linux2)">
+<suite source="/opt/ozone/smoketest/ozonefs/hadoopo3fs.robot" id="s1" name="hadoop32-hadoopo3fs">
+<test id="s1-t1" name="Test hadoop dfs">
+<kw name="Generate Random String" library="String">
+<doc>Generates a string with a desired ``length`` from the given ``chars``.</doc>
+<arguments>
+<arg>5</arg>
+<arg>[NUMBERS]</arg>
+</arguments>
+<assign>
+<var>${random}</var>
+</assign>
+<msg timestamp="20191016 07:04:27.640" level="INFO">${random} = 28775</msg>
+<status status="PASS" endtime="20191016 07:04:27.640" starttime="20191016 07:04:27.639"></status>
+</kw>
+<kw name="Execute" library="commonlib">
+<arguments>
+<arg>hdfs dfs -put /opt/hadoop/NOTICE.txt o3fs://bucket1.vol1/${PREFIX}-${random}</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<kw name="Run And Return Rc And Output" library="OperatingSystem">
+<doc>Runs the given command in the system and returns the RC and output.</doc>
+<arguments>
+<arg>${command}</arg>
+</arguments>
+<assign>
+<var>${rc}</var>
+<var>${output}</var>
+</assign>
+<msg timestamp="20191016 07:04:27.642" level="INFO">Running command 'hdfs dfs -put /opt/hadoop/NOTICE.txt o3fs://bucket1.vol1/ozone-28775 2&gt;&amp;1'.</msg>
+<msg timestamp="20191016 07:04:32.323" level="INFO">${rc} = 1</msg>
+<msg timestamp="20191016 07:04:32.324" level="INFO">${output} = 2019-10-16 07:04:30 INFO  MetricsConfig:118 - Loaded properties from hadoop-metrics2.properties
+2019-10-16 07:04:30 INFO  MetricsSystemImpl:374 - Scheduled Metric snapshot period at 10 second(s).
+2019...</msg>
+<status status="PASS" endtime="20191016 07:04:32.324" starttime="20191016 07:04:27.641"></status>
+</kw>
+<kw name="Log" library="BuiltIn">
+<doc>Logs the given message with the given level.</doc>
+<arguments>
+<arg>${output}</arg>
+</arguments>
+<msg timestamp="20191016 07:04:32.325" level="INFO">2019-10-16 07:04:30 INFO  MetricsConfig:118 - Loaded properties from hadoop-metrics2.properties
+2019-10-16 07:04:30 INFO  MetricsSystemImpl:374 - Scheduled Metric snapshot period at 10 second(s).
+2019-10-16 07:04:30 INFO  MetricsSystemImpl:191 - XceiverClientMetrics metrics system started
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 1 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 2 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 3 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 4 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 5 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 6 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 7 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 8 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 INFO  RetryInvocationHandler:411 - com.google.protobuf.ServiceException: org.apache.hadoop.ipc.RemoteException(java.lang.IllegalMonitorStateException): Releasing lock on resource /vol1/bucket1 without acquiring lock
+	at org.apache.hadoop.ozone.lock.LockManager.getLockForReleasing(LockManager.java:220)
+	at org.apache.hadoop.ozone.lock.LockManager.release(LockManager.java:168)
+	at org.apache.hadoop.ozone.lock.LockManager.writeUnlock(LockManager.java:148)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.unlock(OzoneManagerLock.java:364)
+	at org.apache.hadoop.ozone.om.lock.OzoneManagerLock.releaseWriteLock(OzoneManagerLock.java:329)
+	at org.apache.hadoop.ozone.om.request.key.OMKeyCommitRequest.validateAndUpdateCache(OMKeyCommitRequest.java:177)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequestDirectlyToOM(OzoneManagerProtocolServerSideTranslatorPB.java:219)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.processRequest(OzoneManagerProtocolServerSideTranslatorPB.java:134)
+	at org.apache.hadoop.hdds.server.OzoneProtocolMessageDispatcher.processRequest(OzoneProtocolMessageDispatcher.java:72)
+	at org.apache.hadoop.ozone.protocolPB.OzoneManagerProtocolServerSideTranslatorPB.submitRequest(OzoneManagerProtocolServerSideTranslatorPB.java:100)
+	at org.apache.hadoop.ozone.protocol.proto.OzoneManagerProtocolProtos$OzoneManagerService$2.callBlockingMethod(OzoneManagerProtocolProtos.java)
+	at org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:524)
+	at org.apache.hadoop.ipc.RPC$Server.call(RPC.java:1025)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:876)
+	at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java:822)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:423)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1730)
+	at org.apache.hadoop.ipc.Server$Handler.run(Server.java:2682)
+, while invoking $Proxy10.submitRequest over nodeId=null,nodeAddress=om:9862 after 9 failover attempts. Trying to failover immediately.
+2019-10-16 07:04:31 ERROR OMFailoverProxyProvider:268 - Failed to connect to OM. Attempted 10 retries and 10 failovers
+put: Releasing lock on resource /vol1/bucket1 without acquiring lock</msg>
+<status status="PASS" endtime="20191016 07:04:32.326" starttime="20191016 07:04:32.324"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20191016 07:04:32.326" level="INFO">Argument types are:
+&lt;type 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<msg timestamp="20191016 07:04:32.327" level="FAIL">1 != 0</msg>
+<status status="FAIL" endtime="20191016 07:04:32.327" starttime="20191016 07:04:32.326"></status>
+</kw>
+<status status="FAIL" endtime="20191016 07:04:32.328" starttime="20191016 07:04:27.640"></status>
+</kw>
+<status status="FAIL" endtime="20191016 07:04:32.328" critical="yes" starttime="20191016 07:04:27.639">1 != 0</status>
+</test>
+<doc>Test ozone fs with hadoopfs</doc>
+<status status="FAIL" endtime="20191016 07:04:32.329" starttime="20191016 07:04:27.589"></status>
+</suite>
+<statistics>
+<total>
+<stat fail="1" pass="0">Critical Tests</stat>
+<stat fail="1" pass="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat fail="1" id="s1" name="hadoop32-hadoopo3fs" pass="0">hadoop32-hadoopo3fs</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
